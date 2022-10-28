@@ -195,7 +195,7 @@ const EthOverview = ({ className }) => {
                     properties: {
                       token_symbol: 'ETH',
                       location: EVENT.SOURCE.SWAPS.MAIN_VIEW,
-                      text: 'Bridge',
+                      text: 'Swap',
                     },
                   });
                   dispatch(setSwapsFromToken(defaultSwapsToken));
@@ -206,7 +206,7 @@ const EthOverview = ({ className }) => {
                   }
                 }
               }}
-              label={t('swap')}
+              label="Bridge"
               tooltipRender={
                 isSwapsChain
                   ? null
