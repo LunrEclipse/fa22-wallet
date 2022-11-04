@@ -185,40 +185,25 @@ const EthOverview = ({ className }) => {
             />
             <IconButton
               className="eth-overview__button"
-              disabled={!isSwapsChain}
               Icon={SwapIcon}
               onClick={() => {
-                if (isSwapsChain) {
-                  trackEvent({
-                    event: EVENT_NAMES.NAV_SWAP_BUTTON_CLICKED,
-                    category: EVENT.CATEGORIES.SWAPS,
-                    properties: {
-                      token_symbol: 'ETH',
-                      location: EVENT.SOURCE.SWAPS.MAIN_VIEW,
-                      text: 'Swap',
-                    },
-                  });
-                  dispatch(setSwapsFromToken(defaultSwapsToken));
-                  if (usingHardwareWallet) {
-                    global.platform.openExtensionInBrowser(BUILD_QUOTE_ROUTE);
-                  } else {
-                    history.push(BUILD_QUOTE_ROUTE);
-                  }
+                trackEvent({
+                  event: EVENT_NAMES.BRIDGE_BUTTON_CLICKED,
+                  category: EVENT.CATEGORIES.BRIDGE,
+                  properties: {
+                    token_symbol: 'ETH',
+                    location: EVENT.SOURCE.BRIDGE.MAIN_VIEW,
+                    text: 'Bridge',
+                  },
+                });
+                dispatch(setSwapsFromToken(defaultSwapsToken));
+                if (usingHardwareWallet) {
+                  global.platform.openExtensionInBrowser(BUILD_QUOTE_ROUTE);
+                } else {
+                  history.push(BUILD_QUOTE_ROUTE);
                 }
               }}
               label="Bridge"
-              tooltipRender={
-                isSwapsChain
-                  ? null
-                  : (contents) => (
-                      <Tooltip
-                        title={t('currentlyUnavailable')}
-                        position="bottom"
-                      >
-                        {contents}
-                      </Tooltip>
-                    )
-              }
             />
           </>
         }

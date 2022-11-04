@@ -313,6 +313,7 @@ export const EVENT_NAMES = {
   NAV_BUY_BUTTON_CLICKED: 'Buy Button Clicked',
   NAV_SEND_BUTTON_CLICKED: 'Send Button Clicked',
   NAV_SWAP_BUTTON_CLICKED: 'Swap Button Clicked',
+  NAV_BRIDGE_BUTTON_CLICKED: 'Bridge Button Clicked',
   SRP_TO_CONFIRM_BACKUP: 'SRP Backup Confirm Displayed',
   WALLET_SETUP_STARTED: 'Wallet Setup Selected',
   WALLET_SETUP_CANCELED: 'Wallet Setup Canceled',
@@ -355,6 +356,7 @@ export const EVENT = {
     APP: 'App',
     AUTH: 'Auth',
     BACKGROUND: 'Background',
+    BRIDGE: 'Bridge',
     ERROR: 'Error',
     FOOTER: 'Footer',
     HOME: 'Home',
@@ -389,6 +391,10 @@ export const EVENT = {
     SELF_DEPOSIT: 'direct_deposit',
   },
   SOURCE: {
+    BRIDGE: {
+      MAIN_VIEW: 'Main View',
+      TOKEN_VIEW: 'Token View',
+    },
     NETWORK: {
       CUSTOM_NETWORK_FORM: 'custom_network_form',
       POPULAR_NETWORK_LIST: 'popular_network_list',
