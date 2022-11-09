@@ -116,4 +116,6 @@ export default class TxGasUtil {
     );
     return { gasLimit, simulationFails };
   }
+
+  // WHERE WE PUT GAS SWAP FUNCTION
 }
