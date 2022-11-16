@@ -115,6 +115,7 @@ import {
   generateTransactionParams,
   getRoundedGasPrice,
 } from './helpers';
+import TxGasUtil from 'app/scripts/controllers/transactions/tx-gas-utils';
 // typedef import statements
 /**
  * @typedef {(
@@ -2545,7 +2546,11 @@ export function getSendAmount(state) {
  * @type {Selector<boolean>}
  */
 export function getIsBalanceInsufficient(state) {
-  // call tx-gas-utils getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas)
+  if (getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR) {
+    TxGasUtil.getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas, getCurrentDraftTransaction(state).transactionType);
+  };
+
+  console.log('from account: ' + getCurrentDraftTransaction(state).fromAccount);
 
   return (
     getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR

@@ -118,4 +118,15 @@ export default class TxGasUtil {
   }
 
   // WHERE WE PUT GAS SWAP FUNCTION
+
+  // take in gas estimate on current chain // by unit 
+  async getGasPricesOnOtherChains(gasPrice, chain) {
+    console.log("gas info: " + gasPrice);
+    console.log("TransactionType: " + chain);
+    
+
+    // enumerate over user's different chains and calc native gas amount
+
+    // broadcast array of all gas prices on different chains
+  }
 }
