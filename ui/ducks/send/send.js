@@ -115,9 +115,13 @@ import {
   generateTransactionParams,
   getRoundedGasPrice,
 } from './helpers';
+<<<<<<< HEAD
 
 
 import TxGasUtil from '../../../app/scripts/controllers/transactions/tx-gas-utils';
+=======
+import TxGasUtil from 'app/scripts/controllers/transactions/tx-gas-utils';
+>>>>>>> lay0-01-bridge-gas-fee
 // typedef import statements
 /**
  * @typedef {(

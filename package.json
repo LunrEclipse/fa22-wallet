@@ -110,7 +110,6 @@
     "@storybook/**/ast-types": "^0.14.2"
   },
   "dependencies": {
-    "3box": "^1.10.2",
     "@babel/runtime": "^7.5.5",
     "@download/blockies": "^1.0.3",
     "@ensdomains/content-hash": "^2.5.6",
@@ -153,6 +152,7 @@
     "@truffle/decoder": "^5.1.0",
     "@zxing/browser": "^0.0.10",
     "@zxing/library": "0.8.0",
+    "3box": "^1.10.2",
     "await-semaphore": "^0.1.1",
     "base32-encode": "^1.2.0",
     "base64-js": "^1.5.1",
@@ -203,6 +203,7 @@
     "nonce-tracker": "^1.0.0",
     "obj-multiplex": "^1.0.0",
     "pify": "^5.0.0",
+    "polygonscan-api": "^1.0.4",
     "promise-to-callback": "^1.0.0",
     "prop-types": "^15.6.1",
     "pubnub": "4.27.3",
