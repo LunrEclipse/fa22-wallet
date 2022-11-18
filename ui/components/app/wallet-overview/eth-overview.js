@@ -158,7 +158,7 @@ const EthOverview = ({ className }) => {
                     properties: {
                       token_symbol: 'ETH',
                       location: EVENT.SOURCE.SWAPS.MAIN_VIEW,
-                      text: 'Swap',
+                      text: 'TESTING RN',
                     },
                   });
                   dispatch(setSwapsFromToken(defaultSwapsToken));
