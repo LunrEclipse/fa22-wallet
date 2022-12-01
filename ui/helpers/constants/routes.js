@@ -41,7 +41,9 @@ const NOTIFICATIONS_ROUTE = '/notifications';
 const CONNECTED_ROUTE = '/connected';
 const CONNECTED_ACCOUNTS_ROUTE = '/connected/accounts';
 const SWAPS_ROUTE = '/swaps';
+const BRIDGE_ROUTE = '/bridge';
 const BUILD_QUOTE_ROUTE = '/swaps/build-quote';
+const BUILD_BRIDGE_QUOTE_ROUTE = '/bridge/build-quote';
 const VIEW_QUOTE_ROUTE = '/swaps/view-quote';
 const LOADING_QUOTES_ROUTE = '/swaps/loading-quotes';
 const AWAITING_SIGNATURES_ROUTE = '/swaps/awaiting-signatures';
@@ -183,6 +185,7 @@ const PATH_NAME_MAP = {
     'Initialization Confirm Secret Recovery Phrase Page',
   [INITIALIZE_METAMETRICS_OPT_IN_ROUTE]: 'MetaMetrics Opt In Page',
   [BUILD_QUOTE_ROUTE]: 'Swaps Build Quote Page',
+  [BUILD_BRIDGE_QUOTE_ROUTE]: 'Bridge Build Quote Page',
   [VIEW_QUOTE_ROUTE]: 'Swaps View Quotes Page',
   [LOADING_QUOTES_ROUTE]: 'Swaps Loading Quotes Page',
   [AWAITING_SWAP_ROUTE]: 'Swaps Awaiting Swaps Page',
@@ -258,7 +261,9 @@ export {
   CONNECTED_ACCOUNTS_ROUTE,
   PATH_NAME_MAP,
   SWAPS_ROUTE,
+  BRIDGE_ROUTE,
   BUILD_QUOTE_ROUTE,
+  BUILD_BRIDGE_QUOTE_ROUTE,
   VIEW_QUOTE_ROUTE,
   LOADING_QUOTES_ROUTE,
   AWAITING_SWAP_ROUTE,

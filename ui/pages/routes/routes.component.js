@@ -7,6 +7,7 @@ import IdleTimer from 'react-idle-timer';
 import FirstTimeFlow from '../first-time-flow';
 import SendTransactionScreen from '../send';
 import Swaps from '../swaps';
+import Bridge from '../bridge';
 import ConfirmTransaction from '../confirm-transaction';
 import Home from '../home';
 import Settings from '../settings';
@@ -53,9 +54,11 @@ import {
   REVEAL_SEED_ROUTE,
   SEND_ROUTE,
   SWAPS_ROUTE,
+  BRIDGE_ROUTE,
   SETTINGS_ROUTE,
   UNLOCK_ROUTE,
   BUILD_QUOTE_ROUTE,
+  BUILD_BRIDGE_QUOTE_ROUTE,
   CONFIRMATION_V_NEXT_ROUTE,
   CONFIRM_IMPORT_TOKEN_ROUTE,
   INITIALIZE_ROUTE,
@@ -214,6 +217,7 @@ export default class Routes extends Component {
           exact
         />
         <Authenticated path={SWAPS_ROUTE} component={Swaps} />
+        <Authenticated path={BRIDGE_ROUTE} component={Bridge} />
         <Authenticated
           path={IMPORT_TOKEN_ROUTE}
           component={ImportTokenPage}
@@ -297,6 +301,20 @@ export default class Routes extends Component {
     const { location } = this.props;
     return Boolean(
       matchPath(location.pathname, { path: BUILD_QUOTE_ROUTE, exact: false }),
+    );
+  }
+
+  onBridgePage() {
+    const { location } = this.props;
+    return Boolean(
+      matchPath(location.pathname, { path: BRIDGE_ROUTE, exact: false }),
+    );
+  }
+
+  onBridgeBuildQuotePage() {
+    const { location } = this.props;
+    return Boolean(
+      matchPath(location.pathname, { path: BUILD_BRIDGE_QUOTE_ROUTE, exact: false }),
     );
   }
 
@@ -426,7 +444,8 @@ export default class Routes extends Component {
             disabled={
               this.onConfirmPage() ||
               this.onEditTransactionPage() ||
-              (this.onSwapsPage() && !this.onSwapsBuildQuotePage())
+              (this.onSwapsPage() && !this.onSwapsBuildQuotePage()) ||
+              (this.onBridgePage() && !this.onBridgeBuildQuotePage())
             }
           />
         )}

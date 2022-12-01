@@ -9,6 +9,7 @@ import { I18nContext } from '../../../contexts/i18n';
 import {
   SEND_ROUTE,
   BUILD_QUOTE_ROUTE,
+  BUILD_BRIDGE_QUOTE_ROUTE,
 } from '../../../helpers/constants/routes';
 import Tooltip from '../../ui/tooltip';
 import UserPreferencedCurrencyDisplay from '../user-preferenced-currency-display';
@@ -27,6 +28,7 @@ import SwapIcon from '../../ui/icon/swap-icon.component';
 import BuyIcon from '../../ui/icon/overview-buy-icon.component';
 import SendIcon from '../../ui/icon/overview-send-icon.component';
 import { setSwapsFromToken } from '../../../ducks/swaps/swaps';
+import { setBridgeFromToken } from '../../../ducks/bridge/swaps';
 import IconButton from '../../ui/icon-button';
 import { isHardwareKeyring } from '../../../helpers/utils/hardware';
 import { MetaMetricsContext } from '../../../contexts/metametrics';
@@ -188,7 +190,7 @@ const EthOverview = ({ className }) => {
               Icon={SwapIcon}
               onClick={() => {
                 trackEvent({
-                  event: EVENT_NAMES.BRIDGE_BUTTON_CLICKED,
+                  event: EVENT_NAMES.NAV_BRIDGE_BUTTON_CLICKED,
                   category: EVENT.CATEGORIES.BRIDGE,
                   properties: {
                     token_symbol: 'ETH',
@@ -196,11 +198,11 @@ const EthOverview = ({ className }) => {
                     text: 'Bridge',
                   },
                 });
-                dispatch(setSwapsFromToken(defaultSwapsToken));
+                dispatch(setBridgeFromToken(defaultSwapsToken));
                 if (usingHardwareWallet) {
-                  global.platform.openExtensionInBrowser(BUILD_QUOTE_ROUTE);
+                  global.platform.openExtensionInBrowser(BUILD_BRIDGE_QUOTE_ROUTE);
                 } else {
-                  history.push(BUILD_QUOTE_ROUTE);
+                  history.push(BUILD_BRIDGE_QUOTE_ROUTE);
                 }
               }}
               label="Bridge"
