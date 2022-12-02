@@ -213,18 +213,24 @@ export default function BuildQuote({
     tokenList,
   );
 
-  const tokensToSearchSwapFrom = useTokensToSearch({
+  let tokensToSearchSwapFrom = useTokensToSearch({
     usersTokens: memoizedUsersTokens,
     topTokens: topAssets,
     shuffledTokensList,
     tokenBucketPriority: TOKEN_BUCKET_PRIORITY.OWNED,
   });
-  const tokensToSearchSwapTo = useTokensToSearch({
+  tokensToSearchSwapFrom = tokensToSearchSwapFrom.filter(
+    (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
+  );
+  let tokensToSearchSwapTo = useTokensToSearch({
     usersTokens: memoizedUsersTokens,
     topTokens: topAssets,
     shuffledTokensList,
     tokenBucketPriority: TOKEN_BUCKET_PRIORITY.TOP,
   });
+  tokensToSearchSwapTo = tokensToSearchSwapTo.filter(
+    (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
+  );
   const selectedToToken =
     tokensToSearchSwapFrom.find(({ address }) =>
       isEqualCaseInsensitive(address, toToken?.address),
