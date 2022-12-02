@@ -109,6 +109,9 @@ import { hexToDecimal } from '../../../../shared/lib/metamask-controller-utils';
 import { calcTokenAmount } from '../../../../shared/lib/transactions-controller-utils';
 import { shouldEnableDirectWrapping } from '../../../../shared/lib/swaps-utils';
 
+import { ethers, signer } from "ethers";
+import stargateABI from "../../../utils/stargateABI"
+
 const fuseSearchKeys = [
   { name: 'name', weight: 0.499 },
   { name: 'symbol', weight: 0.499 },
@@ -580,6 +583,71 @@ export default function BuildQuote({
     smartTransactionsOptInStatus,
   ]);
 
+  async function reviewBridge () {
+    // TODO: get provider
+    let provider = ethers.getDefaultProvider('goerli');
+    // TODO: get private key
+    let wallet = await ethers.Wallet(privateKey)
+
+    const stargateAddr = "0x7612aE2a34E5A363E137De748801FB4c86499152";
+    let stargateContract = await ethers.Contract(stargateAddr, stargateABI, provider)
+
+    let signer = await wallet.connect(provider)
+
+    stargateContract = await stargateContract.connect(signer)
+
+    /*
+      args 
+
+      uint16 _dstChainId,
+      uint256 _srcPoolId,
+      uint256 _dstPoolId,
+      address payable _refundAddress,
+      uint256 _amountLD,
+      uint256 _minAmountLD,
+      lzTxObj memory _lzTxParams,
+      bytes calldata _to,
+      bytes calldata _payload
+    */
+
+    // TODO: get user address, get all of these args
+    const swapTxn = await stargateContract.swap(
+      dstChainId,
+      srcPoolId,
+      dstPoolId,
+      walletAddress,
+      amountLD,
+      minAmountLD,
+      lzTxParams,
+      to,
+      payload
+    )
+
+
+    // We need this to know how long it took to go from clicking on the Review swap button to rendered View Quote page.
+    dispatch(setReviewSwapClickedTimestamp(Date.now()));
+    // In case that quotes prefetching is waiting to be executed, but hasn't started yet,
+    // we want to cancel it and fetch quotes from here.
+    if (timeoutIdForQuotesPrefetching) {
+      clearTimeout(timeoutIdForQuotesPrefetching);
+      dispatch(
+        fetchQuotesAndSetQuoteState(
+          history,
+          fromTokenInputValue,
+          maxSlippage,
+          trackEvent,
+        ),
+      );
+    } else if (areQuotesPresent) {
+      // If there are prefetched quotes already, go directly to the View Quote page.
+      history.push(VIEW_QUOTE_ROUTE);
+    } else {
+      // If the "Review swap" button was clicked while quotes are being fetched, go to the Loading Quotes page.
+      await dispatch(setBackgroundSwapRouteState('loading'));
+      history.push(LOADING_QUOTES_ROUTE);
+    }
+  }
+
   return (
     <div className="build-quote">
       <div className="build-quote__content">
@@ -857,30 +925,7 @@ export default function BuildQuote({
       <SwapsFooter
         onSubmit={
           /* istanbul ignore next */
-          async () => {
-            // We need this to know how long it took to go from clicking on the Review swap button to rendered View Quote page.
-            dispatch(setReviewSwapClickedTimestamp(Date.now()));
-            // In case that quotes prefetching is waiting to be executed, but hasn't started yet,
-            // we want to cancel it and fetch quotes from here.
-            if (timeoutIdForQuotesPrefetching) {
-              clearTimeout(timeoutIdForQuotesPrefetching);
-              dispatch(
-                fetchQuotesAndSetQuoteState(
-                  history,
-                  fromTokenInputValue,
-                  maxSlippage,
-                  trackEvent,
-                ),
-              );
-            } else if (areQuotesPresent) {
-              // If there are prefetched quotes already, go directly to the View Quote page.
-              history.push(VIEW_QUOTE_ROUTE);
-            } else {
-              // If the "Review swap" button was clicked while quotes are being fetched, go to the Loading Quotes page.
-              await dispatch(setBackgroundSwapRouteState('loading'));
-              history.push(LOADING_QUOTES_ROUTE);
-            }
-          }
+          reviewBridge
         }
         submitText={"Review Bridge"}
         disabled={isReviewSwapButtonDisabled}
