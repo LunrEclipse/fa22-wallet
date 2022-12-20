@@ -203,6 +203,7 @@
     "nonce-tracker": "^1.0.0",
     "obj-multiplex": "^1.0.0",
     "pify": "^5.0.0",
+    "polygonscan-api": "^1.0.4",
     "promise-to-callback": "^1.0.0",
     "prop-types": "^15.6.1",
     "pubnub": "4.27.3",

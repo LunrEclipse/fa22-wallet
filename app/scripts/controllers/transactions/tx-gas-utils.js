@@ -122,20 +122,20 @@ export default class TxGasUtil {
   // take in gas estimate on current chain // by unit 
   async getGasPricesOnOtherChains(gasObj, chain) {
     console.log(gasObj)
-    console.log(parseInt(gasObj.gasTotal)); // gasTotal is what we need to use
+    console.log("gastotal: ", parseInt(gasObj.gasTotal)); // gasTotal is what we need to use
     console.log("TransactionType: " + chain);
     var gasNeeded = 9999; // this gets passed in
 
-    // var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+    var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+    var balance = api.account.balance("0x0000000000000000000000000000000000001010");
 
-    // var balance = api.account.balance("0x0000000000000000000000000000000000001010");
-    // var balanceMATIC;
+    var balanceData = await balance.then(function (balanceData) {
+      return balanceData;
+    });
+    console.log(balanceData);
+    var balanceMATIC = balanceData.result;
 
-    // balance.then(function (balanceData) {
-    //   balanceMATIC = balanceData.result;
-    // });
-
-    // console.log("Account balance: " + balanceData.result + " MATIC");
+    console.log("Account balance: " + balanceMATIC + " MATIC");
 
     // if (gasNeeded <= balanceMATIC) {
     //   console.log("sufficient gas");
@@ -146,4 +146,15 @@ export default class TxGasUtil {
 
     // broadcast array of all gas prices on different chains
   }
+
+  async getPolygonBalance(addr) {
+    var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+    var balance = api.account.balance(addr);
+
+    balance.then(function (balanceData) {
+      console.log(balanceData)
+      return balanceData;
+    });
+  }
+
 }
