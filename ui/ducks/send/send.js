@@ -2552,7 +2552,7 @@ export function getIsBalanceInsufficient(state) {
   const gasUtils = new TxGasUtil(state.metamask.provider)
   if (getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR) {
     gasUtils.getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas, getCurrentDraftTransaction(state).transactionType);
-
+    
   };
 
 

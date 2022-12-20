@@ -120,10 +120,10 @@ export default class TxGasUtil {
   // WHERE WE PUT GAS SWAP FUNCTION
 
   // take in gas estimate on current chain // by unit 
-  async getGasPricesOnOtherChains(gasPrice, chain) {
-    console.log(gasPrice);
+  async getGasPricesOnOtherChains(gasObj, chain) {
+    console.log(gasObj)
+    console.log(parseInt(gasObj.gasTotal)); // gasTotal is what we need to use
     console.log("TransactionType: " + chain);
-
     var gasNeeded = 9999; // this gets passed in
 
     // var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
