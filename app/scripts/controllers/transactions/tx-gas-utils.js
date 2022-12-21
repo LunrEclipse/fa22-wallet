@@ -121,10 +121,12 @@ export default class TxGasUtil {
 
   // take in gas estimate on current chain // by unit 
   async getGasPricesOnOtherChains(gasObj, chain) {
+    console.log("entered getGasPricesOnOtherChains")
     console.log(gasObj)
     console.log("gastotal: ", parseInt(gasObj.gasTotal)); // gasTotal is what we need to use
     console.log("TransactionType: " + chain);
-    var gasNeeded = 9999; // this gets passed in
+    
+    var gasNeeded = 9999; // TODO: this sbould get passed in from send.js/getIsBalanceInsufficient
 
     var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
     var balance = api.account.balance("0x0000000000000000000000000000000000001010");
@@ -137,14 +139,10 @@ export default class TxGasUtil {
 
     console.log("Account balance: " + balanceMATIC + " MATIC");
 
-    // if (gasNeeded <= balanceMATIC) {
-    //   console.log("sufficient gas");
-    // }
+    if (gasNeeded <= balanceMATIC) {
+      // TODO: perform MATIC --> ETH swap
+    }
     
-
-    // enumerate over user's different chains and calc native gas amount
-
-    // broadcast array of all gas prices on different chains
   }
 
   async getPolygonBalance(addr) {
@@ -152,7 +150,6 @@ export default class TxGasUtil {
     var balance = api.account.balance(addr);
 
     balance.then(function (balanceData) {
-      console.log(balanceData)
       return balanceData;
     });
   }
