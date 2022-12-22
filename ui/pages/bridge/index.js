@@ -395,9 +395,9 @@ export default function Swap() {
           <div
             className="swaps__header-cancel"
             onClick={async () => {
-              // clearTemporaryTokenRef.current();
-              // dispatch(clearSwapsState());
-              // await dispatch(resetBackgroundSwapsState());
+              clearTemporaryTokenRef.current();
+              dispatch(clearSwapsState());
+              await dispatch(resetBackgroundSwapsState());
               history.push(DEFAULT_ROUTE);
             }}
           >

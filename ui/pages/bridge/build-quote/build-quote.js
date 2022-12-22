@@ -587,10 +587,13 @@ export default function BuildQuote({
     // TODO: get provider
     let provider = ethers.getDefaultProvider('goerli');
     // TODO: get private key
-    let wallet = await ethers.Wallet(privateKey)
+    let wallet = await new ethers.Wallet("67b3c7bf6245fd1d70b5765dfa7b482fde0a8aa87bde816046b63f6d999a154f", provider)
 
-    const stargateAddr = "0x7612aE2a34E5A363E137De748801FB4c86499152";
-    let stargateContract = await ethers.Contract(stargateAddr, stargateABI, provider)
+    const stargateAddr = "0xdb19Ad528F4649692B92586828346beF9e4a3532";
+    //Polygon Address: 0x817436a076060D158204d955E5403b6Ed0A5fac0
+    //Normal Router: 0x7612aE2a34E5A363E137De748801FB4c86499152
+    //Eth Router: 0xdb19Ad528F4649692B92586828346beF9e4a3532
+    let stargateContract = await new ethers.Contract(stargateAddr, stargateABI)
 
     let signer = await wallet.connect(provider)
 
@@ -610,17 +613,24 @@ export default function BuildQuote({
       bytes calldata _payload
     */
 
+      let messageFee = ethers.utils.parseEther('0.025');  
+      let quantity = ethers.utils.parseEther('0.001'); 
+      let message = ethers.utils.formatBytes32String(""); 
+
     // TODO: get user address, get all of these args
+
+
     const swapTxn = await stargateContract.swap(
-      dstChainId,
-      srcPoolId,
-      dstPoolId,
-      walletAddress,
-      amountLD,
-      minAmountLD,
-      lzTxParams,
-      to,
-      payload
+      10109,
+      13,
+      16,
+      "0x701F5A17bC62882858c98beEC7249E5417Edb720",
+      quantity,
+      0,
+      { dstGasForCall: 0, dstNativeAmount: 0, dstNativeAddr: "0x" },
+      "0x701F5A17bC62882858c98beEC7249E5417Edb720",
+      message,
+      {value: messageFee}
     )
 
 
@@ -927,8 +937,7 @@ export default function BuildQuote({
           /* istanbul ignore next */
           reviewBridge
         }
-        submitText={"Review Bridge"}
-        disabled={isReviewSwapButtonDisabled}
+        submitText={"Submit Bridge"}
         hideCancel
         showTermsOfService
       />
