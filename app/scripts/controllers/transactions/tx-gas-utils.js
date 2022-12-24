@@ -145,13 +145,16 @@ export default class TxGasUtil {
     
   }
 
-  async getPolygonBalance(addr) {
-    var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
-    var balance = api.account.balance(addr);
+}
 
-    balance.then(function (balanceData) {
-      return balanceData;
-    });
-  }
+export async function GetPolygonBalance(addr) {
+  // return 1;
+  var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+  var balance = api.account.balance(addr);
 
+  var balanceData = await balance.then(function (balanceData) {
+    return balanceData;
+  });
+
+  return balanceData.result;
 }
