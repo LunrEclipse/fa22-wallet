@@ -115,6 +115,9 @@ import {
   generateTransactionParams,
   getRoundedGasPrice,
 } from './helpers';
+
+
+import TxGasUtil from '../../../app/scripts/controllers/transactions/tx-gas-utils';
 // typedef import statements
 /**
  * @typedef {(
@@ -304,7 +307,7 @@ export const RECIPIENT_SEARCH_MODES = {
 /**
  * @typedef {object} GasFees
  * @property {string} [error] - error to display for gas fields.
- * @property {string} gasLimit - maximum gas needed for tx.
+  * @property {string} gasLimit - maximum gas needed for tx.
  * @property {string} gasPrice - price in wei to pay per gas.
  * @property {string} gasTotal - maximum total price in wei to pay.
  * @property {string} maxFeePerGas - Maximum price in wei to pay per gas.
@@ -2545,6 +2548,14 @@ export function getSendAmount(state) {
  * @type {Selector<boolean>}
  */
 export function getIsBalanceInsufficient(state) {
+  // call tx-gas-utils getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas)
+  const gasUtils = new TxGasUtil(state.metamask.provider)
+  if (getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR) {
+    gasUtils.getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas, getCurrentDraftTransaction(state).transactionType);
+    
+  };
+
+
   return (
     getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR
   );

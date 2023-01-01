@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import PageContainerContent from '../../../components/ui/page-container/page-container-content.component';
 import Dialog from '../../../components/ui/dialog';
@@ -16,10 +16,12 @@ import SendAmountRow from './send-amount-row';
 import SendHexDataRow from './send-hex-data-row';
 import SendAssetRow from './send-asset-row';
 import SendGasRow from './send-gas-row';
+import { GetPolygonBalance } from '../../../../app/scripts/controllers/transactions/tx-gas-utils.js';
 
 export default class SendContent extends Component {
   state = {
     showNicknamePopovers: false,
+    polygonBalance: '',
   };
 
   static contextTypes = {
@@ -44,6 +46,19 @@ export default class SendContent extends Component {
     acknowledgeRecipientWarning: PropTypes.func,
     recipientWarningAcknowledged: PropTypes.bool,
   };
+
+  async fetchPolygonBalance() {
+    return await GetPolygonBalance("0x0000000000000000000000000000000000001010");
+  }
+
+  componentDidMount() {
+    this.fetchPolygonBalance()
+      .then(polygonBalance => {
+        this.setState({
+          polygonBalance
+        });
+      })
+  }
 
   render() {
     const {
@@ -98,6 +113,36 @@ export default class SendContent extends Component {
           {networkOrAccountNotSupports1559 ? <SendGasRow /> : null}
           {showHexData ? <SendHexDataRow /> : null}
         </div>
+
+        <br/>
+
+        {/* { Display only if there is insufficient gas } */}
+        {
+          (gasError == INSUFFICIENT_FUNDS_FOR_GAS_ERROR_KEY) &&
+          <>
+            <div className="ens-input send__to-row">
+              Sufficient balance detected on another chain. Perform a cross-chain swap to pay gas fees?
+            </div>
+
+            <div className="ens-input send__to-row">
+              Polygon Balance (MATIC): {this.state.polygonBalance}
+
+              <button style={{ background: '#037dd6' }} /*onClick={bridgePolygon()}*/> {/* Update once swap function is defined */}
+                <text style={{ color: 'white' }}>Swap {null} MATIC for {null} ETH</text>
+              </button>
+            </div>
+
+            <div className="ens-input send__to-row">
+              Avalanche Balance (AVAX): {this.state.polygonBalance}
+
+              <button style={{ background: '#037dd6' }} /*onClick={bridgeAvalanche()}*/> {/* Update once swap function is defined */}
+                <text style={{ color: 'white' }}>Swap {null} AVAX for {null} ETH</text>
+              </button>
+            </div>
+          </>
+        }
+
+
       </PageContainerContent>
     );
   }

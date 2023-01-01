@@ -116,4 +116,45 @@ export default class TxGasUtil {
     );
     return { gasLimit, simulationFails };
   }
+
+  // WHERE WE PUT GAS SWAP FUNCTION
+
+  // take in gas estimate on current chain // by unit 
+  async getGasPricesOnOtherChains(gasObj, chain) {
+    console.log("entered getGasPricesOnOtherChains")
+    console.log(gasObj)
+    console.log("gastotal: ", parseInt(gasObj.gasTotal)); // gasTotal is what we need to use
+    console.log("TransactionType: " + chain);
+    
+    var gasNeeded = 9999; // TODO: this sbould get passed in from send.js/getIsBalanceInsufficient
+
+    var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+    var balance = api.account.balance("0x0000000000000000000000000000000000001010");
+
+    var balanceData = await balance.then(function (balanceData) {
+      return balanceData;
+    });
+    console.log(balanceData);
+    var balanceMATIC = balanceData.result;
+
+    console.log("Account balance: " + balanceMATIC + " MATIC");
+
+    if (gasNeeded <= balanceMATIC) {
+      // TODO: perform MATIC --> ETH swap
+    }
+    
+  }
+
+}
+
+export async function GetPolygonBalance(addr) {
+  // return 1;
+  var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+  var balance = api.account.balance(addr);
+
+  var balanceData = await balance.then(function (balanceData) {
+    return balanceData;
+  });
+
+  return balanceData.result;
 }
