@@ -2545,20 +2545,16 @@ export function getSendAmount(state) {
  * Selector that returns true if the user has enough native asset balance to
  * cover the cost of the transaction.
  *
- * @type {Selector<boolean>}
+ * @type {Selector<Array>}
  */
-export function getIsBalanceInsufficient(state) {
+export async function getIsBalanceInsufficient(state) {
   // call tx-gas-utils getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas)
   const gasUtils = new TxGasUtil(state.metamask.provider)
+  let outputArr = []; 
   if (getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR) {
-    gasUtils.getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas, getCurrentDraftTransaction(state).transactionType);
-    
+    outputArr = await gasUtils.getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas, getSelectedAccount(state).address);
   };
-
-
-  return (
-    getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR
-  );
+  return outputArr;
 }
 
 /**

@@ -21,7 +21,7 @@ import { GetPolygonBalance } from '../../../../app/scripts/controllers/transacti
 export default class SendContent extends Component {
   state = {
     showNicknamePopovers: false,
-    polygonBalance: '',
+    otherChainOptions: [],
   };
 
   static contextTypes = {
@@ -38,7 +38,7 @@ export default class SendContent extends Component {
     isEthGasPrice: PropTypes.bool,
     noGasPrice: PropTypes.bool,
     networkOrAccountNotSupports1559: PropTypes.bool,
-    getIsBalanceInsufficient: PropTypes.bool,
+    getIsBalanceInsufficient: PropTypes.object,
     asset: PropTypes.object,
     to: PropTypes.string,
     assetError: PropTypes.string,
@@ -46,19 +46,19 @@ export default class SendContent extends Component {
     acknowledgeRecipientWarning: PropTypes.func,
     recipientWarningAcknowledged: PropTypes.bool,
   };
-
+  // TODO: make a general getter that returns an array of balances and their chains
   async fetchPolygonBalance() {
     return await GetPolygonBalance("0x0000000000000000000000000000000000001010");
   }
-
-  componentDidMount() {
-    this.fetchPolygonBalance()
-      .then(polygonBalance => {
-        this.setState({
-          polygonBalance
-        });
+  
+  componentDidUpdate(prevProps) {
+    if (this.props.getIsBalanceInsufficient !== prevProps.getIsBalanceInsufficient) {
+      this.props.getIsBalanceInsufficient.then((arr) => {
+        this.setState({otherChainOptions: arr})
       })
-  }
+    }
+  };
+
 
   render() {
     const {
@@ -80,7 +80,7 @@ export default class SendContent extends Component {
       gasError = GAS_PRICE_EXCESSIVE_ERROR_KEY;
     } else if (noGasPrice) {
       gasError = GAS_PRICE_FETCH_FAILURE_ERROR_KEY;
-    } else if (getIsBalanceInsufficient) {
+    } else if (this.state.otherChainOptions?.length !== 0) {
       gasError = INSUFFICIENT_FUNDS_FOR_GAS_ERROR_KEY;
     }
     const showHexData =
@@ -91,7 +91,8 @@ export default class SendContent extends Component {
     const showKnownRecipientWarning =
       recipient.warning === 'knownAddressRecipient';
     const hideAddContactDialog = recipient.warning === 'loading';
-
+    
+    console.log(this.state.otherChainOptions);
     return (
       <PageContainerContent>
         <div className="send-v2__form">
@@ -117,35 +118,31 @@ export default class SendContent extends Component {
         <br/>
 
         {/* { Display only if there is insufficient gas } */}
+
         {
           (gasError == INSUFFICIENT_FUNDS_FOR_GAS_ERROR_KEY) &&
           <>
             <div className="ens-input send__to-row">
               Sufficient balance detected on another chain. Perform a cross-chain swap to pay gas fees?
             </div>
-
-            <div className="ens-input send__to-row">
-              Polygon Balance (MATIC): {this.state.polygonBalance}
-
-              <button style={{ background: '#037dd6' }} /*onClick={bridgePolygon()}*/> {/* Update once swap function is defined */}
-                <text style={{ color: 'white' }}>Swap {null} MATIC for {null} ETH</text>
-              </button>
-            </div>
-
-            <div className="ens-input send__to-row">
-              Avalanche Balance (AVAX): {this.state.polygonBalance}
-
-              <button style={{ background: '#037dd6' }} /*onClick={bridgeAvalanche()}*/> {/* Update once swap function is defined */}
-                <text style={{ color: 'white' }}>Swap {null} AVAX for {null} ETH</text>
-              </button>
-            </div>
           </>
         }
 
 
+        {this.state.otherChainOptions.map((swap) => (
+          <div className="ens-input send__to-row" key={swap}>
+            {swap[1]} Balance: {swap[0]}
+        
+            <button style={{ background: '#037dd6' }} /*onClick={bridgePolygon()}*/>
+              <text style={{ color: 'white' }}>Swap {null} {swap[0]} for {null} ETH</text>
+            </button>
+          </div>
+        ))}
+
       </PageContainerContent>
     );
-  }
+  };
+  
 
   maybeRenderAddContact() {
     const { t } = this.context;
