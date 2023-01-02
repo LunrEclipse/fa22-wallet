@@ -110,7 +110,7 @@ import { calcTokenAmount } from '../../../../shared/lib/transactions-controller-
 import { shouldEnableDirectWrapping } from '../../../../shared/lib/swaps-utils';
 
 import { ethers, signer } from "ethers";
-import stargateABI from "../../../utils/stargateABI"
+import stargateABI from "../../../utils/ethRouter"
 
 const fuseSearchKeys = [
   { name: 'name', weight: 0.499 },
@@ -614,23 +614,31 @@ export default function BuildQuote({
     */
 
       let messageFee = ethers.utils.parseEther('0.025');  
-      let quantity = ethers.utils.parseEther('0.001'); 
+      let quantity = ethers.utils.parseEther('0.01'); 
+      let min = ethers.utils.parseEther('0.005');
       let message = ethers.utils.formatBytes32String(""); 
 
-    // TODO: get user address, get all of these args
 
+    // const swapTxn = await stargateContract.swap(
+    //   10143,
+    //   13,
+    //   13,
+    //   "0x701F5A17bC62882858c98beEC7249E5417Edb720",
+    //   quantity,
+    //   0,
+    //   { dstGasForCall: 0, dstNativeAmount: 0, dstNativeAddr: "0x" },
+    //   "0x701F5A17bC62882858c98beEC7249E5417Edb720",
+    //   message,
+    //   {value: messageFee, gasLimit: 1000000}
+    // )
 
-    const swapTxn = await stargateContract.swap(
-      10109,
-      13,
-      16,
+    const swapTxn = await stargateContract.swapETH(
+      10143,
+      "0x701F5A17bC62882858c98beEC7249E5417Edb720",
       "0x701F5A17bC62882858c98beEC7249E5417Edb720",
       quantity,
-      0,
-      { dstGasForCall: 0, dstNativeAmount: 0, dstNativeAddr: "0x" },
-      "0x701F5A17bC62882858c98beEC7249E5417Edb720",
-      message,
-      {value: messageFee}
+      min,
+      {value: messageFee, gasLimit: 1000000}
     )
 
 
