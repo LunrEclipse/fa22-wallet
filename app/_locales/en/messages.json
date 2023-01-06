@@ -308,11 +308,11 @@
     "message": "Amount"
   },
   "appDescription": {
-    "message": "An Ethereum Wallet in your Browser",
+    "message": "A MultiChain Wallet Experience",
     "description": "The description of the application"
   },
   "appName": {
-    "message": "MetaMask",
+    "message": "Interstellar.",
     "description": "The name of the application"
   },
   "appNameBeta": {

@@ -1,5 +1,5 @@
 .unlock-page {
-  color: var(--color-text-default);
+  color: white;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -13,7 +13,7 @@
     align-self: stretch;
     justify-content: center;
     flex: 1 0 auto;
-    background: var(--color-background-default);
+    background: black;
   }
 
   &__mascot-container {
@@ -25,12 +25,13 @@
 
     margin-top: 5px;
     font-weight: 800;
-    color: var(--color-text-alternative);
+    color: white;
   }
 
   &__form {
     width: 100%;
     margin: 56px 0 8px;
+    color: white;
   }
 
   &__links {
@@ -50,7 +51,7 @@
     font-size: 0.75rem;
 
     a {
-      color: var(--color-primary-default);
+      color: white;
     }
   }
 }

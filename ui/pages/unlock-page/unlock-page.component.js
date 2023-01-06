@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import getCaretCoordinates from 'textarea-caret';
 import Button from '../../components/ui/button';
 import TextField from '../../components/ui/text-field';
-import Mascot from '../../components/ui/mascot';
 import { DEFAULT_ROUTE } from '../../helpers/constants/routes';
 import {
   EVENT,
@@ -138,13 +137,12 @@ export default class UnlockPage extends Component {
 
   renderSubmitButton() {
     const style = {
-      backgroundColor: 'var(--color-primary-default)',
-      color: 'var(--color-primary-inverse)',
+      backgroundColor: 'black',
+      color: 'white',
       marginTop: '20px',
       height: '60px',
       fontWeight: '400',
       boxShadow: 'none',
-      borderRadius: '100px',
     };
 
     return (
@@ -171,14 +169,14 @@ export default class UnlockPage extends Component {
       <div className="unlock-page__container">
         <div className="unlock-page" data-testid="unlock-page">
           <div className="unlock-page__mascot-container">
-            <Mascot
-              animationEventEmitter={this.animationEventEmitter}
+            <img
               width="120"
               height="120"
+              src="images/logo/interstellar-logo.png"
             />
           </div>
-          <h1 className="unlock-page__title">{t('welcomeBack')}</h1>
-          <div>{t('unlockMessage')}</div>
+          <h1 className="unlock-page__title">Interstellar.</h1>
+          <div>Welcome Back!</div>
           <form className="unlock-page__form" onSubmit={this.handleSubmit}>
             <TextField
               id="password"
@@ -204,34 +202,6 @@ export default class UnlockPage extends Component {
             >
               {t('forgotPassword')}
             </Button>
-          </div>
-          <div className="unlock-page__support">
-            {t('needHelp', [
-              <a
-                href={SUPPORT_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                key="need-help-link"
-                onClick={() => {
-                  this.context.trackEvent(
-                    {
-                      category: EVENT.CATEGORIES.NAVIGATION,
-                      event: EVENT_NAMES.SUPPORT_LINK_CLICKED,
-                      properties: {
-                        url: SUPPORT_LINK,
-                      },
-                    },
-                    {
-                      contextPropsIntoEventProperties: [
-                        CONTEXT_PROPS.PAGE_TITLE,
-                      ],
-                    },
-                  );
-                }}
-              >
-                {t('needHelpLinkText')}
-              </a>,
-            ])}
           </div>
         </div>
       </div>

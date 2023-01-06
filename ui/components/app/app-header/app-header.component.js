@@ -117,15 +117,6 @@ export default class AppHeader extends PureComponent {
     return (
       <div className="app-header">
         <div className="app-header__contents">
-          <MetaFoxLogo
-            unsetIconHeight
-            onClick={async () => {
-              if (onClick) {
-                await onClick();
-              }
-              history.push(DEFAULT_ROUTE);
-            }}
-          />
           <div className="app-header__account-menu-container">
             {!hideNetworkIndicator && (
               <div className="app-header__network-component-wrapper">
