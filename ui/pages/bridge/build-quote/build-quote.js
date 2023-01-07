@@ -587,7 +587,7 @@ export default function BuildQuote({
     // TODO: get provider
     let provider = ethers.getDefaultProvider('goerli');
     // TODO: get private key
-    let wallet = await new ethers.Wallet("67b3c7bf6245fd1d70b5765dfa7b482fde0a8aa87bde816046b63f6d999a154f", provider)
+    let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
 
     const stargateAddr = "0xdb19Ad528F4649692B92586828346beF9e4a3532";
     //Polygon Address: 0x817436a076060D158204d955E5403b6Ed0A5fac0
@@ -634,8 +634,8 @@ export default function BuildQuote({
 
     const swapTxn = await stargateContract.swapETH(
       10143,
-      "0x701F5A17bC62882858c98beEC7249E5417Edb720",
-      "0x701F5A17bC62882858c98beEC7249E5417Edb720",
+      "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
+      "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
       quantity,
       min,
       {value: messageFee, gasLimit: 1000000}
