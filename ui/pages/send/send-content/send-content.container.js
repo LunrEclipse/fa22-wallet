@@ -3,6 +3,7 @@ import {
   accountsWithSendEtherInfoSelector,
   getAddressBookEntry,
   getIsEthGasPriceFetched,
+  getMetaMaskAccountsOrdered,
   getNoGasPriceFetched,
   checkNetworkOrAccountNotSupports1559,
 } from '../../../selectors';
@@ -20,6 +21,7 @@ import SendContent from './send-content.component';
 
 function mapStateToProps(state) {
   const ownedAccounts = accountsWithSendEtherInfoSelector(state);
+  const accounts = getMetaMaskAccountsOrdered(state);
   const to = getSendTo(state);
   const recipient = getRecipient(state);
   const recipientWarningAcknowledged =
@@ -30,6 +32,7 @@ function mapStateToProps(state) {
         ({ address }) => address.toLowerCase() === to.toLowerCase(),
       ),
     ),
+    accounts,
     contact: getAddressBookEntry(state, to),
     isEthGasPrice: getIsEthGasPriceFetched(state),
     noGasPrice: getNoGasPriceFetched(state),

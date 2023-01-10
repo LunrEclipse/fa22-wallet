@@ -134,7 +134,7 @@ export default class TxGasUtil {
     // if (gasNeeded <= balanceMATIC) {
     //   // TODO: perform MATIC --> ETH swap
     // }
-    return [[balance.result, 'Polygon'], [100, 'Avalanche']];
+    return [{balance: balance.result, chain: 'Polygon'}, {balance: 100, chain: 'Arbitrum'}, {balance: 21000, chain: 'Goerli'}, {balance: 120312, chain: 'Optimism'}]; // todo: update w proper names
   }
 }
 

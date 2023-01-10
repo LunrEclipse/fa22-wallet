@@ -122,6 +122,75 @@ const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
 
+export async function reviewBridge (selectedAccountAddress='', chain='') {
+  // TODO: get provider
+  let provider = ethers.getDefaultProvider('goerli');
+  // TODO: get private key
+  let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
+
+  const stargateAddr = "0xdb19Ad528F4649692B92586828346beF9e4a3532";
+  //Polygon Address: 0x817436a076060D158204d955E5403b6Ed0A5fac0
+  //Normal Router: 0x7612aE2a34E5A363E137De748801FB4c86499152
+  //Eth Router: 0xdb19Ad528F4649692B92586828346beF9e4a3532
+  let stargateContract = await new ethers.Contract(stargateAddr, stargateABI)
+
+  let signer = await wallet.connect(provider)
+
+  stargateContract = await stargateContract.connect(signer)
+
+  /*
+    args 
+
+    uint16 _dstChainId,
+    uint256 _srcPoolId,
+    uint256 _dstPoolId,
+    address payable _refundAddress,
+    uint256 _amountLD,
+    uint256 _minAmountLD,
+    lzTxObj memory _lzTxParams,
+    bytes calldata _to,
+    bytes calldata _payload
+  */
+
+    let messageFee = ethers.utils.parseEther('0.025');  
+    let quantity = ethers.utils.parseEther('0.01'); 
+    let min = ethers.utils.parseEther('0.005');
+    let message = ethers.utils.formatBytes32String(""); 
+
+  const swapTxn = await stargateContract.swapETH(
+    10143,
+    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
+    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
+    quantity,
+    min,
+    {value: messageFee, gasLimit: 1000000}
+  )
+
+
+  // We need this to know how long it took to go from clicking on the Review swap button to rendered View Quote page.
+  dispatch(setReviewSwapClickedTimestamp(Date.now()));
+  // In case that quotes prefetching is waiting to be executed, but hasn't started yet,
+  // we want to cancel it and fetch quotes from here.
+  if (timeoutIdForQuotesPrefetching) {
+    clearTimeout(timeoutIdForQuotesPrefetching);
+    dispatch(
+      fetchQuotesAndSetQuoteState(
+        history,
+        fromTokenInputValue,
+        maxSlippage,
+        trackEvent,
+      ),
+    );
+  } else if (areQuotesPresent) {
+    // If there are prefetched quotes already, go directly to the View Quote page.
+    history.push(VIEW_QUOTE_ROUTE);
+  } else {
+    // If the "Review swap" button was clicked while quotes are being fetched, go to the Loading Quotes page.
+    await dispatch(setBackgroundSwapRouteState('loading'));
+    history.push(LOADING_QUOTES_ROUTE);
+  }
+}
+
 export default function BuildQuote({
   ethBalance,
   selectedAccountAddress,
@@ -583,89 +652,6 @@ export default function BuildQuote({
     smartTransactionsOptInStatus,
   ]);
 
-  async function reviewBridge () {
-    // TODO: get provider
-    let provider = ethers.getDefaultProvider('goerli');
-    // TODO: get private key
-    let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
-
-    const stargateAddr = "0xdb19Ad528F4649692B92586828346beF9e4a3532";
-    //Polygon Address: 0x817436a076060D158204d955E5403b6Ed0A5fac0
-    //Normal Router: 0x7612aE2a34E5A363E137De748801FB4c86499152
-    //Eth Router: 0xdb19Ad528F4649692B92586828346beF9e4a3532
-    let stargateContract = await new ethers.Contract(stargateAddr, stargateABI)
-
-    let signer = await wallet.connect(provider)
-
-    stargateContract = await stargateContract.connect(signer)
-
-    /*
-      args 
-
-      uint16 _dstChainId,
-      uint256 _srcPoolId,
-      uint256 _dstPoolId,
-      address payable _refundAddress,
-      uint256 _amountLD,
-      uint256 _minAmountLD,
-      lzTxObj memory _lzTxParams,
-      bytes calldata _to,
-      bytes calldata _payload
-    */
-
-      let messageFee = ethers.utils.parseEther('0.025');  
-      let quantity = ethers.utils.parseEther('0.01'); 
-      let min = ethers.utils.parseEther('0.005');
-      let message = ethers.utils.formatBytes32String(""); 
-
-
-    // const swapTxn = await stargateContract.swap(
-    //   10143,
-    //   13,
-    //   13,
-    //   "0x701F5A17bC62882858c98beEC7249E5417Edb720",
-    //   quantity,
-    //   0,
-    //   { dstGasForCall: 0, dstNativeAmount: 0, dstNativeAddr: "0x" },
-    //   "0x701F5A17bC62882858c98beEC7249E5417Edb720",
-    //   message,
-    //   {value: messageFee, gasLimit: 1000000}
-    // )
-
-    const swapTxn = await stargateContract.swapETH(
-      10143,
-      "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
-      "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
-      quantity,
-      min,
-      {value: messageFee, gasLimit: 1000000}
-    )
-
-
-    // We need this to know how long it took to go from clicking on the Review swap button to rendered View Quote page.
-    dispatch(setReviewSwapClickedTimestamp(Date.now()));
-    // In case that quotes prefetching is waiting to be executed, but hasn't started yet,
-    // we want to cancel it and fetch quotes from here.
-    if (timeoutIdForQuotesPrefetching) {
-      clearTimeout(timeoutIdForQuotesPrefetching);
-      dispatch(
-        fetchQuotesAndSetQuoteState(
-          history,
-          fromTokenInputValue,
-          maxSlippage,
-          trackEvent,
-        ),
-      );
-    } else if (areQuotesPresent) {
-      // If there are prefetched quotes already, go directly to the View Quote page.
-      history.push(VIEW_QUOTE_ROUTE);
-    } else {
-      // If the "Review swap" button was clicked while quotes are being fetched, go to the Loading Quotes page.
-      await dispatch(setBackgroundSwapRouteState('loading'));
-      history.push(LOADING_QUOTES_ROUTE);
-    }
-  }
-
   return (
     <div className="build-quote">
       <div className="build-quote__content">
@@ -943,7 +929,7 @@ export default function BuildQuote({
       <SwapsFooter
         onSubmit={
           /* istanbul ignore next */
-          reviewBridge
+          reviewBridge(props.selectedAccountAddress, 'goerli')
         }
         submitText={"Submit Bridge"}
         hideCancel

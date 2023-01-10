@@ -16,66 +16,90 @@ import SendAmountRow from './send-amount-row';
 import SendHexDataRow from './send-hex-data-row';
 import SendAssetRow from './send-asset-row';
 import SendGasRow from './send-gas-row';
+import { reviewBridge } from '../../bridge/build-quote/build-quote';
+import { getSelectedAccount } from '../../../selectors';
+import stargateABI from "../../../utils/ethRouter"
+import { ethers, signer } from "ethers";
 
+// TODO: put into separate types folder
+const chains = [
+  {
+    chainName: 'Polygon', 
+    tokenSymbol: 'MATIC',
+    providerName: 'https://matic-mumbai.chainstacklabs.com',
+    stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
+    stargateID: 10109
+  },
+  {
+    chainName: 'Goerli',
+    tokenSymbol: 'ETH',
+    providerName: 'https://rpc.ankr.com/eth_goerli',
+    stargateAddress: '0xdb19Ad528F4649692B92586828346beF9e4a3532',
+    stargateID: 10121
+  },
+  {
+    chainName: 'Arbitrum',
+    tokenSymbol: 'ETH',
+    providerName: 'https://goerli-rollup.arbitrum.io/rpc',
+    stargateAddress: '0x7612aE2a34E5A363E137De748801FB4c86499152',
+    stargateID: 10143
+  },
+  {
+    chainName: 'Optimism',
+    tokenSymbol: 'ETH',
+    providerName: 'https://mainnet.optimism.io', // fix
+    stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
+    stargateID: 10132
+  }
+]
 // TODO: make this bridge MATIC --> ETH
-async function bridgePolygon () {
-  // TODO: get provider
-  let provider = ethers.getDefaultProvider('goerli');
+async function bridgePolygon (senderAccountAddress, sourceChainName, dstChainName) { // add params
+  console.log('sdfsdgiusdbgisdbib')
+  const srcChain = chains.find((chain) => chain.chainName === sourceChainName);
+  const dstChain = chains.find((chain) => chain.chainName === dstChainName);
+
+  console.log(srcChain)
+  let provider = ethers.getDefaultProvider(srcChain.providerName)
+  console.log('PROVIDER: ', provider)
   // TODO: get private key
   let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
+  console.log('WALLET: ', wallet)
 
-  const stargateAddr = "0xdb19Ad528F4649692B92586828346beF9e4a3532";
-  //Polygon Address: 0x817436a076060D158204d955E5403b6Ed0A5fac0
-  //Normal Router: 0x7612aE2a34E5A363E137De748801FB4c86499152
-  //Eth Router: 0xdb19Ad528F4649692B92586828346beF9e4a3532
-  let stargateContract = await new ethers.Contract(stargateAddr, stargateABI)
+  //Starting Chain
+  let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI) // wheres stargateABI from?
+  console.log('CONTRACT: ', stargateContract)
 
   let signer = await wallet.connect(provider)
+  console.log('SIGNER: ', signer)
 
   stargateContract = await stargateContract.connect(signer)
+  console.log('CONTRATCT2: ', stargateContract)
 
   /*
     args 
-
     uint16 _dstChainId,
-    uint256 _srcPoolId,
-    uint256 _dstPoolId,
     address payable _refundAddress,
-    uint256 _amountLD,
-    uint256 _minAmountLD,
-    lzTxObj memory _lzTxParams,
     bytes calldata _to,
-    bytes calldata _payload
+    uint256 _amountLD,
+    uint256 _minAmountLD
   */
 
-    let messageFee = ethers.utils.parseEther('0.025');  
-    let quantity = ethers.utils.parseEther('0.01'); 
-    let min = ethers.utils.parseEther('0.005');
+    let messageFee = ethers.utils.parseEther('0.0025');  
+    let quantity = ethers.utils.parseEther('0.001'); 
+    let min = ethers.utils.parseEther('0.0005');
     let message = ethers.utils.formatBytes32String(""); 
-
-
-  // const swapTxn = await stargateContract.swap(
-  //   10143,
-  //   13,
-  //   13,
-  //   "0x701F5A17bC62882858c98beEC7249E5417Edb720",
-  //   quantity,
-  //   0,
-  //   { dstGasForCall: 0, dstNativeAmount: 0, dstNativeAddr: "0x" },
-  //   "0x701F5A17bC62882858c98beEC7249E5417Edb720",
-  //   message,
-  //   {value: messageFee, gasLimit: 1000000}
-  // )
-
+    //Destination Chain 
+    //Arbitrum Pool ID: 10143
+    //Goerli Pool ID: 10121
+    //Optimism Pool ID: 10132
   const swapTxn = await stargateContract.swapETH(
-    10143,
-    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
-    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
+    dstChain.stargateID, // goerli
+    senderAccountAddress, //user's address
+    senderAccountAddress, //user's address
     quantity,
     min,
     {value: messageFee, gasLimit: 1000000}
   )
-
 
   // We need this to know how long it took to go from clicking on the Review swap button to rendered View Quote page.
   dispatch(setReviewSwapClickedTimestamp(Date.now()));
@@ -99,6 +123,14 @@ async function bridgePolygon () {
     await dispatch(setBackgroundSwapRouteState('loading'));
     history.push(LOADING_QUOTES_ROUTE);
   }
+
+  if (swapTxn) {
+    console.log('Success')
+    return 'Success'
+  } else {
+    console.log('Fail')
+    return 'Fail'
+  }
 }
 
 export default class SendContent extends Component {
@@ -119,6 +151,7 @@ export default class SendContent extends Component {
     error: PropTypes.string,
     gasIsExcessive: PropTypes.bool.isRequired,
     isEthGasPrice: PropTypes.bool,
+    accounts: PropTypes.any,
     noGasPrice: PropTypes.bool,
     networkOrAccountNotSupports1559: PropTypes.bool,
     getIsBalanceInsufficient: PropTypes.object,
@@ -131,13 +164,16 @@ export default class SendContent extends Component {
   };
   
   componentDidUpdate(prevProps) {
+    // console.log('IN FUNCTION: ', this.state)
+    // console.log('IN FUNCTION ADDRESSS: ', getSelectedAccount(this.state).address)
+    
     if (this.props.getIsBalanceInsufficient !== prevProps.getIsBalanceInsufficient) {
       this.props.getIsBalanceInsufficient.then((arr) => {
         this.setState({otherChainOptions: arr})
       })
     }
   };
-
+  
   render() {
     const {
       warning,
@@ -147,6 +183,7 @@ export default class SendContent extends Component {
       noGasPrice,
       networkOrAccountNotSupports1559,
       getIsBalanceInsufficient,
+      accounts,
       asset,
       assetError,
       recipient,
@@ -170,7 +207,7 @@ export default class SendContent extends Component {
       recipient.warning === 'knownAddressRecipient';
     const hideAddContactDialog = recipient.warning === 'loading';
     
-    console.log(this.state.otherChainOptions);
+    // TODO: DYNAMICALLY GET CURRENT CHAIN ID
     return (
       <PageContainerContent>
         <div className="send-v2__form">
@@ -208,11 +245,11 @@ export default class SendContent extends Component {
 
 
         {this.state.otherChainOptions.map((swap) => (
-          <div className="ens-input send__to-row" key={swap}>
-            {swap[1]} Balance: {swap[0]}
+          <div className="ens-input send__to-row" key={swap.chain}>
+            {swap.chain} Balance: {swap.balance}
         
-            <button style={{ background: '#037dd6' }} onClick={bridgePolygon()}>
-              <text style={{ color: 'white' }}>Swap {null} {swap[0]} for {null} ETH </text>
+            <button style={{ background: '#037dd6' }} onClick={() => bridgePolygon(this.props.accounts[0].address, swap.chain, 'Goerli')}>
+              <text style={{ color: 'white' }}>Swap {null} {swap.balance} for {null} ETH </text>
             </button>
           </div>
         ))}
