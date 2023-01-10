@@ -134,6 +134,7 @@ import TypedMessageManager from './lib/typed-message-manager';
 import TransactionController from './controllers/transactions';
 import DetectTokensController from './controllers/detect-tokens';
 import SwapsController from './controllers/swaps';
+import BridgeController from './controllers/swaps';
 import accountImporter from './account-import-strategies';
 import seedPhraseVerifier from './lib/seed-phrase-verifier';
 import MetaMetricsController from './controllers/metametrics';
@@ -987,6 +988,22 @@ export default class MetamaskController extends EventEmitter {
       getEIP1559GasFeeEstimates:
         this.gasFeeController.fetchGasFeeEstimates.bind(this.gasFeeController),
     });
+    this.bridgeController = new BridgeController({
+      getBufferedGasLimit: this.txController.txGasUtil.getBufferedGasLimit.bind(
+        this.txController.txGasUtil,
+      ),
+      networkController: this.networkController,
+      provider: this.provider,
+      getProviderConfig: this.networkController.getProviderConfig.bind(
+        this.networkController,
+      ),
+      getTokenRatesState: () => this.tokenRatesController.state,
+      getCurrentChainId: this.networkController.getCurrentChainId.bind(
+        this.networkController,
+      ),
+      getEIP1559GasFeeEstimates:
+        this.gasFeeController.fetchGasFeeEstimates.bind(this.gasFeeController),
+    });
     this.smartTransactionsController = new SmartTransactionsController(
       {
         onNetworkStateChange: this.networkController.store.subscribe.bind(
@@ -1084,6 +1101,7 @@ export default class MetamaskController extends EventEmitter {
         SubjectMetadataController: this.subjectMetadataController,
         ThreeBoxController: this.threeBoxController.store,
         BackupController: this.backupController,
+        BridgeController: this.bridgeController,
         SwapsController: this.swapsController.store,
         EnsController: this.ensController.store,
         ApprovalController: this.approvalController,
@@ -1515,6 +1533,7 @@ export default class MetamaskController extends EventEmitter {
       preferencesController,
       qrHardwareKeyring,
       swapsController,
+      bridgeController,
       threeBoxController,
       tokensController,
       smartTransactionsController,
@@ -1900,6 +1919,11 @@ export default class MetamaskController extends EventEmitter {
         swapsController.setSwapsUserFeeLevel.bind(swapsController),
       setSwapsQuotesPollingLimitEnabled:
         swapsController.setSwapsQuotesPollingLimitEnabled.bind(swapsController),
+      
+      
+      // bridge
+      executeBridgeTransaction:
+        bridgeController.executeBridgeTransaction.bind(bridgeController),
 
       // Smart Transactions
       setSmartTransactionsOptInStatus:
