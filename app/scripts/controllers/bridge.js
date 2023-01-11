@@ -120,11 +120,12 @@ export default class BridgeController {
     });
   }
 
-  async executeBridgeTransaction() {
-    // TODO: get provider
-  let provider = ethers.getDefaultProvider('goerli');
-  // TODO: get private key
-  let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
+  async executeBridgeTransaction(address, destinationChain, quantity) {
+    const contract = new ethers.Contract(
+      contractAddress,
+      stargateABI,
+      this.ethersProvider,
+    );
 
   //Starting Chain
   const stargateAddr = "";
@@ -138,12 +139,6 @@ export default class BridgeController {
   //EthRouter Georli: 0xdb19Ad528F4649692B92586828346beF9e4a3532
   //EthRouter Arbitrum: 0x7612aE2a34E5A363E137De748801FB4c86499152
   //EthRouter Optimism: 0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08
-  let stargateContract = await new ethers.Contract(stargateAddr, stargateABI)
-
-  let signer = await wallet.connect(provider)
-
-  stargateContract = await stargateContract.connect(signer)
-
   /*
     args 
     uint16 _dstChainId,
@@ -164,10 +159,10 @@ export default class BridgeController {
     //Optimism Pool ID: 10132
     this.
     getSelectedAccount(state).address
-  const swapTxn = await stargateContract.swapETH(
-    10143,
-    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a", //user's address
-    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a", //user's address
+  return await contract.swapETH(
+    destinationChain,
+    address, //user's address
+    address, //user's address
     quantity,
     min,
     {value: messageFee, gasLimit: 1000000}
