@@ -121,18 +121,52 @@ const fuseSearchKeys = [
 const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
+// todo: put this into a types location
+const chains = [
+  {
+    chainName: 'Polygon', 
+    tokenSymbol: 'MATIC',
+    providerName: 'https://matic-mumbai.chainstacklabs.com',
+    stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
+    stargateID: 10109,
+    metamaskChainID: "0x1f41"
+  },
+  {
+    chainName: 'Goerli',
+    tokenSymbol: 'ETH',
+    providerName: 'https://rpc.ankr.com/eth_goerli',
+    stargateAddress: '0xdb19Ad528F4649692B92586828346beF9e4a3532',
+    stargateID: 10121,
+    metamaskChainID: '0x5'
+  },
+  {
+    chainName: 'Arbitrum',
+    tokenSymbol: 'ETH',
+    providerName: 'https://goerli-rollup.arbitrum.io/rpc',
+    stargateAddress: '0x7612aE2a34E5A363E137De748801FB4c86499152',
+    stargateID: 10143,
+    metamaskChainID: '0x66eed'
+  },
+  {
+    chainName: 'Optimism',
+    tokenSymbol: 'ETH',
+    providerName: 'https://mainnet.optimism.io', // fix
+    stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
+    stargateID: 10132,
+    metamaskChainID: '0x1a4'
+  }
+]
 
-export async function reviewBridge (selectedAccountAddress='', chain='') {
-  // TODO: get provider
-  let provider = ethers.getDefaultProvider('goerli');
+export async function reviewBridge (senderAccountAddress, srcChainName, dstChainID) {
+  const srcChain = chains.find((chain) => chain.chainName === srcChainName);
+  const dstChain = chains.find((chain) => chain.metamaskChainID === dstChainID);
+
+  let provider = ethers.getDefaultProvider(srcChain.providerName)
   // TODO: get private key
   let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
 
-  const stargateAddr = "0xdb19Ad528F4649692B92586828346beF9e4a3532";
-  //Polygon Address: 0x817436a076060D158204d955E5403b6Ed0A5fac0
-  //Normal Router: 0x7612aE2a34E5A363E137De748801FB4c86499152
-  //Eth Router: 0xdb19Ad528F4649692B92586828346beF9e4a3532
-  let stargateContract = await new ethers.Contract(stargateAddr, stargateABI)
+  //Starting Chain
+  let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI)
 
   let signer = await wallet.connect(provider)
 
@@ -140,54 +174,44 @@ export async function reviewBridge (selectedAccountAddress='', chain='') {
 
   /*
     args 
-
     uint16 _dstChainId,
-    uint256 _srcPoolId,
-    uint256 _dstPoolId,
     address payable _refundAddress,
-    uint256 _amountLD,
-    uint256 _minAmountLD,
-    lzTxObj memory _lzTxParams,
     bytes calldata _to,
-    bytes calldata _payload
+    uint256 _amountLD,
+    uint256 _minAmountLD
   */
 
-    let messageFee = ethers.utils.parseEther('0.025');  
-    let quantity = ethers.utils.parseEther('0.01'); 
-    let min = ethers.utils.parseEther('0.005');
+    let messageFee = ethers.utils.parseEther('0.0025');  
+    let quantity = ethers.utils.parseEther('0.001'); 
+    let min = ethers.utils.parseEther('0.0005');
     let message = ethers.utils.formatBytes32String(""); 
-
+    //Destination Chain 
+    //Arbitrum Pool ID: 10143
+    //Goerli Pool ID: 10121
+    //Optimism Pool ID: 10132
   const swapTxn = await stargateContract.swapETH(
-    10143,
-    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
-    "0x7367ec59E54acbEabB856d665A7eEc0066F4830a",
+    dstChain.stargateID, // goerli
+    senderAccountAddress, //user's address
+    senderAccountAddress, //user's address
     quantity,
     min,
     {value: messageFee, gasLimit: 1000000}
-  )
-
-
-  // We need this to know how long it took to go from clicking on the Review swap button to rendered View Quote page.
-  dispatch(setReviewSwapClickedTimestamp(Date.now()));
-  // In case that quotes prefetching is waiting to be executed, but hasn't started yet,
-  // we want to cancel it and fetch quotes from here.
-  if (timeoutIdForQuotesPrefetching) {
-    clearTimeout(timeoutIdForQuotesPrefetching);
-    dispatch(
-      fetchQuotesAndSetQuoteState(
-        history,
-        fromTokenInputValue,
-        maxSlippage,
-        trackEvent,
-      ),
-    );
-  } else if (areQuotesPresent) {
-    // If there are prefetched quotes already, go directly to the View Quote page.
-    history.push(VIEW_QUOTE_ROUTE);
+  ) // errors not logged properly from stargate 
+  
+  console.log(swapTxn)
+  
+  if (swapTxn) {
+    return {
+      srcChain,
+      dstChain,
+      txHash: swapTxn.hash,
+      value: ethers.utils.formatEther(swapTxn.value.toNumber()),
+      success: true
+    }
   } else {
-    // If the "Review swap" button was clicked while quotes are being fetched, go to the Loading Quotes page.
-    await dispatch(setBackgroundSwapRouteState('loading'));
-    history.push(LOADING_QUOTES_ROUTE);
+    return {      
+      success: false
+    }
   }
 }
 
