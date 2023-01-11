@@ -172,23 +172,10 @@ export async function reviewBridge (senderAccountAddress, srcChainName, dstChain
 
   stargateContract = await stargateContract.connect(signer)
 
-  /*
-    args 
-    uint16 _dstChainId,
-    address payable _refundAddress,
-    bytes calldata _to,
-    uint256 _amountLD,
-    uint256 _minAmountLD
-  */
-
     let messageFee = ethers.utils.parseEther('0.0025');  
     let quantity = ethers.utils.parseEther('0.001'); 
     let min = ethers.utils.parseEther('0.0005');
     let message = ethers.utils.formatBytes32String(""); 
-    //Destination Chain 
-    //Arbitrum Pool ID: 10143
-    //Goerli Pool ID: 10121
-    //Optimism Pool ID: 10132
   const swapTxn = await stargateContract.swapETH(
     dstChain.stargateID, // goerli
     senderAccountAddress, //user's address
@@ -679,90 +666,6 @@ export default function BuildQuote({
   return (
     <div className="build-quote">
       <div className="build-quote__content">
-        {showSmartTransactionsOptInPopover && (
-          <Popover
-            title={t('stxAreHere')}
-            footer={
-              <>
-                <Button type="primary" onClick={onEnableSmartTransactionsClick}>
-                  {t('enableSmartTransactions')}
-                </Button>
-                <Box marginTop={1}>
-                  <Typography variant={TYPOGRAPHY.H6}>
-                    <Button
-                      type="link"
-                      onClick={onCloseSmartTransactionsOptInPopover}
-                      className="smart-transactions-popover__no-thanks-link"
-                    >
-                      {t('noThanksVariant2')}
-                    </Button>
-                  </Typography>
-                </Box>
-              </>
-            }
-            footerClassName="smart-transactions-popover__footer"
-            className="smart-transactions-popover"
-          >
-            <Box
-              paddingRight={6}
-              paddingLeft={6}
-              paddingTop={0}
-              paddingBottom={0}
-              display={DISPLAY.FLEX}
-              className="smart-transactions-popover__content"
-            >
-              <Box
-                marginTop={0}
-                marginBottom={4}
-                display={DISPLAY.FLEX}
-                flexDirection={FLEX_DIRECTION.COLUMN}
-              >
-                <img
-                  src="./images/logo/smart-transactions-header.png"
-                  alt={t('swapSwapSwitch')}
-                />
-              </Box>
-              <Typography variant={TYPOGRAPHY.H7} marginTop={0}>
-                {t('stxDescription')}
-              </Typography>
-              <Typography
-                as="ul"
-                variant={TYPOGRAPHY.H7}
-                fontWeight={FONT_WEIGHT.BOLD}
-                marginTop={3}
-              >
-                <li>{t('stxBenefit1')}</li>
-                <li>{t('stxBenefit2')}</li>
-                <li>{t('stxBenefit3')}</li>
-                <li>
-                  {t('stxBenefit4')}
-                  <Typography
-                    as="span"
-                    fontWeight={FONT_WEIGHT.NORMAL}
-                    variant={TYPOGRAPHY.H7}
-                  >
-                    {' *'}
-                  </Typography>
-                </li>
-              </Typography>
-              <Typography
-                variant={TYPOGRAPHY.H8}
-                color={COLORS.TEXT_ALTERNATIVE}
-                boxProps={{ marginTop: 3 }}
-              >
-                {t('stxSubDescription')}&nbsp;
-                <Typography
-                  as="span"
-                  fontWeight={FONT_WEIGHT.BOLD}
-                  variant={TYPOGRAPHY.H8}
-                  color={COLORS.TEXT_ALTERNATIVE}
-                >
-                  {t('stxYouCanOptOut')}&nbsp;
-                </Typography>
-              </Typography>
-            </Box>
-          </Popover>
-        )}
         <div className="build-quote__dropdown-input-pair-header">
           <div className="build-quote__input-label">Bridge from</div>
           {!isSwapsDefaultTokenSymbol(fromTokenSymbol, chainId) && (
@@ -951,13 +854,12 @@ export default function BuildQuote({
           ))}
       </div>
       <SwapsFooter
-        onSubmit={
-          /* istanbul ignore next */
-          reviewBridge(props.selectedAccountAddress, 'goerli')
-        }
+        // onSubmit={
+        //   /* istanbul ignore next */
+        //   reviewBridge(props.selectedAccountAddress, 'goerli')
+        // }
         submitText={"Submit Bridge"}
         hideCancel
-        showTermsOfService
       />
     </div>
   );

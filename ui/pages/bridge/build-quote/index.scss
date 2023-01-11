@@ -40,9 +40,8 @@
   &__title,
   &__input-label {
     @include H5;
-
     font-weight: bold;
-    color: var(--color-text-default);
+    color: white;
     margin-top: 3px;
   }
 
