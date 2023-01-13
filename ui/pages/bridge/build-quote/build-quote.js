@@ -16,7 +16,7 @@ import { I18nContext } from '../../../contexts/i18n';
 import DropdownInputPair from '../dropdown-input-pair';
 import DropdownSearchList from '../dropdown-search-list';
 import SlippageButtons from '../slippage-buttons';
-import { getTokens, getConversionRate } from '../../../ducks/metamask/metamask';
+import { getTokens, getConversionRate, findKeyringForAddress } from '../../../ducks/metamask/metamask';
 import InfoTooltip from '../../../components/ui/info-tooltip';
 import Popover from '../../../components/ui/popover';
 import Button from '../../../components/ui/button';
@@ -69,6 +69,7 @@ import {
   getTokenList,
   isHardwareWallet,
   getHardwareWalletType,
+  getMetaMaskKeyrings,
 } from '../../../selectors';
 
 import { getValueFromWeiHex } from '../../../helpers/utils/conversions.util';
@@ -111,7 +112,6 @@ import { shouldEnableDirectWrapping } from '../../../../shared/lib/swaps-utils';
 
 import { ethers, signer } from "ethers";
 import stargateABI from "../../../utils/ethRouter"
-
 const fuseSearchKeys = [
   { name: 'name', weight: 0.499 },
   { name: 'symbol', weight: 0.499 },
@@ -140,7 +140,7 @@ const chains = [
     metamaskChainID: '0x5'
   },
   {
-    chainName: 'Arbitrum',
+    chainName: 'c',
     tokenSymbol: 'ETH',
     providerName: 'https://goerli-rollup.arbitrum.io/rpc',
     stargateAddress: '0x7612aE2a34E5A363E137De748801FB4c86499152',
@@ -157,9 +157,13 @@ const chains = [
   }
 ]
 
-export async function reviewBridge (senderAccountAddress, srcChainName, dstChainID) {
-  const srcChain = chains.find((chain) => chain.chainName === srcChainName);
-  const dstChain = chains.find((chain) => chain.metamaskChainID === dstChainID);
+export async function reviewBridge (c, sourceChain, destinationChain) {
+  if (sourceChain === undefined || destinationChain === undefined) {
+    return
+  }
+
+  const srcChain = chains.find((chain) => chain.chainName === sourceChain.name);
+  const dstChain = chains.find((chain) => chain.metamaskChainID === destinationChain.name);
 
   let provider = ethers.getDefaultProvider(srcChain.providerName)
   // TODO: get private key
@@ -178,8 +182,8 @@ export async function reviewBridge (senderAccountAddress, srcChainName, dstChain
     let message = ethers.utils.formatBytes32String(""); 
   const swapTxn = await stargateContract.swapETH(
     dstChain.stargateID, // goerli
-    senderAccountAddress, //user's address
-    senderAccountAddress, //user's address
+    address, //user's address
+    address, //user's address
     quantity,
     min,
     {value: messageFee, gasLimit: 1000000}
@@ -217,6 +221,7 @@ export default function BuildQuote({
   const [verificationClicked, setVerificationClicked] = useState(false);
 
   const isFeatureFlagLoaded = useSelector(getIsFeatureFlagLoaded);
+  const keyring = useSelector(getMetaMaskKeyrings)
   const balanceError = useSelector(getBalanceError);
   const fetchParams = useSelector(getFetchParams, isEqual);
   const { sourceTokenInfo = {}, destinationTokenInfo = {} } =
@@ -274,6 +279,7 @@ export default function BuildQuote({
 
   const { loading, tokensWithBalances } = useTokenTracker(tokens);
 
+
   // If the fromToken was set in a call to `onFromSelect` (see below), and that from token has a balance
   // but is not in tokensWithBalances or tokens, then we want to add it to the usersTokens array so that
   // the balance of the token can appear in the from token selection dropdown
@@ -296,24 +302,55 @@ export default function BuildQuote({
     tokenList,
   );
 
-  let tokensToSearchSwapFrom = useTokensToSearch({
-    usersTokens: memoizedUsersTokens,
-    topTokens: topAssets,
-    shuffledTokensList,
-    tokenBucketPriority: TOKEN_BUCKET_PRIORITY.OWNED,
-  });
-  tokensToSearchSwapFrom = tokensToSearchSwapFrom.filter(
-    (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
-  );
-  let tokensToSearchSwapTo = useTokensToSearch({
-    usersTokens: memoizedUsersTokens,
-    topTokens: topAssets,
-    shuffledTokensList,
-    tokenBucketPriority: TOKEN_BUCKET_PRIORITY.TOP,
-  });
-  tokensToSearchSwapTo = tokensToSearchSwapTo.filter(
-    (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
-  );
+  let tokensToSearchSwapFrom = [
+    {
+      address: '0x0000000000000000000000000000000000000000',
+      decimals: 18,
+      iconUrl: "./images/black-eth-logo.svg",
+      name: "Goerli",
+      symbol: "Goerli",
+      primaryLabel: "Goerli",
+      secondaryLabel: "ETH",
+    },
+    {
+      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      decimals: 18,
+      iconUrl: "./images/black-eth-logo.svg",
+      name: "Arbitrum",
+      symbol: "Arbitrum",
+      primaryLabel: "Arbitrum",
+      secondaryLabel: "ETH",
+    },
+    {
+      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+      decimals: 18,
+      iconUrl: "./images/black-eth-logo.svg",
+      name: "Optimism",
+      symbol: "Optimism",
+      primaryLabel: "Optimism",
+      secondaryLabel: "ETH",
+    },
+  ]
+  // let temp = useTokensToSearch({
+  //   usersTokens: memoizedUsersTokens,
+  //   topTokens: topAssets,
+  //   shuffledTokensList,
+  //   tokenBucketPriority: TOKEN_BUCKET_PRIORITY.OWNED,
+  // });
+  // console.log(temp);
+  // tokensToSearchSwapFrom = tokensToSearchSwapFrom.filter(
+  //   (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
+  // );
+  let tokensToSearchSwapTo = tokensToSearchSwapFrom
+  // let tokensToSearchSwapTo = useTokensToSearch({
+  //   usersTokens: memoizedUsersTokens,
+  //   topTokens: topAssets,
+  //   shuffledTokensList,
+  //   tokenBucketPriority: TOKEN_BUCKET_PRIORITY.TOP,
+  // });
+  // tokensToSearchSwapTo = tokensToSearchSwapTo.filter(
+  //   (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
+  // );
   const selectedToToken =
     tokensToSearchSwapFrom.find(({ address }) =>
       isEqualCaseInsensitive(address, toToken?.address),
@@ -854,10 +891,14 @@ export default function BuildQuote({
           ))}
       </div>
       <SwapsFooter
-        // onSubmit={
-        //   /* istanbul ignore next */
-        //   reviewBridge(props.selectedAccountAddress, 'goerli')
-        // }
+        onSubmit={
+          /* istanbul ignore next */
+          () => {
+            if (selectedFromToken && selectedToToken) {
+              onSubmit(selectedAccountAddress, selectedFromToken, selectedToToken);
+            }
+          }
+        }
         submitText={"Submit Bridge"}
         hideCancel
       />

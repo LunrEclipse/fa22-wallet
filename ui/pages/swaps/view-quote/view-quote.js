@@ -19,6 +19,7 @@ import { useEqualityCheck } from '../../../hooks/useEqualityCheck';
 import { usePrevious } from '../../../hooks/usePrevious';
 import { useGasFeeInputs } from '../../../hooks/gasFeeInput/useGasFeeInputs';
 import { MetaMetricsContext } from '../../../contexts/metametrics';
+import { reviewBridge } from '../../bridge/build-quote/build-quote';
 import FeeCard from '../fee-card';
 import {
   FALLBACK_GAS_MULTIPLIER,
@@ -63,6 +64,7 @@ import {
   getHardwareWalletType,
   checkNetworkAndAccountSupports1559,
   getUSDConversionRate,
+  getSelectedAddress,
 } from '../../../selectors';
 import { getNativeCurrency, getTokens } from '../../../ducks/metamask/metamask';
 
@@ -916,13 +918,21 @@ export default function ViewQuote() {
         >
           {viewQuotePriceDifferenceComponent}
           {(showInsufficientWarning || tokenBalanceUnavailable) && (
-            <ActionableMessage
-              message={actionableBalanceErrorMessage}
-              onClose={
-                /* istanbul ignore next */
-                () => setWarningHidden(true)
-              }
-            />
+            <div>
+              <ActionableMessage
+                message={actionableBalanceErrorMessage}
+                primaryAction={{
+                  label: "Bridge",
+                  onClick: () => reviewBridge(getSelectedAddress(state), this.state.chain, this.props.activeNetwork),
+                }}
+                onClose={
+                  /* istanbul ignore next */
+                  () => setWarningHidden(true)
+                }
+              />
+
+
+            </div>
           )}
         </div>
         <div className="view-quote__countdown-timer-container">
@@ -995,6 +1005,7 @@ export default function ViewQuote() {
           </div>
         )}
       </div>
+      {/* Add insuffient funds stuff here */}
       <SwapsFooter
         onSubmit={
           /* istanbul ignore next */ () => {
