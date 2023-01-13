@@ -14,7 +14,7 @@
 
     width: 100%;
     font-weight: 500;
-    color: var(--color-text-default);
+    color: white;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -28,6 +28,7 @@
     color: var(--color-text-alternative);
     display: flex;
     align-items: center;
+    color: #abacad;
   }
 
   &__clickable {
@@ -44,7 +45,7 @@
 
     &:hover,
     &:active {
-      background-color: var(--color-background-alternative);
+      background-color: #424242;
     }
   }
 

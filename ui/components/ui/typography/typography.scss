@@ -17,7 +17,7 @@
 
   @each $variant, $color in design-system.$color-map {
     &--color-#{$variant} {
-      color: var($color);
+      color: white;
     }
   }
 
@@ -31,6 +31,7 @@
     &--style-#{$style} {
       font-style: $style;
     }
+    color: #abacad
   }
 
   @each $alignment in design-system.$text-align {

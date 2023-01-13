@@ -103,7 +103,7 @@ const AssetList = ({ onClickAsset }) => {
       <Box marginTop={detectedTokens.length > 0 ? 0 : 4}>
         <Box justifyContent={JUSTIFY_CONTENT.CENTER}>
           <Typography
-            color={COLORS.TEXT_ALTERNATIVE}
+            color={0xabacad}
             variant={TYPOGRAPHY.H6}
             fontWeight={FONT_WEIGHT.NORMAL}
           >

@@ -9,8 +9,9 @@
   &__list {
     display: flex;
     justify-content: flex-start;
+    border: 1px solid white;
     border-bottom: 1px solid var(--color-border-default);
-    background-color: var(--color-background-default);
+    background-color: black;
     position: sticky;
     top: 0;
     z-index: 2;

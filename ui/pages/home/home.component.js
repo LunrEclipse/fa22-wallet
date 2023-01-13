@@ -651,7 +651,7 @@ export default class Home extends PureComponent {
           {isPopup && !connectedStatusPopoverHasBeenShown
             ? this.renderPopover()
             : null}
-          <div className="home__main-view">
+          <div className="home__main-view" style={{ background: 'black' }}>
             <MenuBar />
             <div className="home__balance-wrapper">
               <EthOverview />

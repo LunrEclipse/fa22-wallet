@@ -4,12 +4,13 @@
   align-items: center;
   background-color: unset;
   text-align: center;
+  color: white;
 
   @include H7;
 
   font-size: 13px;
   cursor: pointer;
-  color: var(--color-primary-default);
+  color: #abacad;
 
   &__circle {
     display: flex;
@@ -17,7 +18,8 @@
     align-items: center;
     height: 36px;
     width: 36px;
-    background: var(--color-primary-default);
+    background: #424242;
+    border-color: white;
     border-radius: 18px;
     margin-top: 6px;
     margin-bottom: 5px;

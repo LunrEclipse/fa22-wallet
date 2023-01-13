@@ -9,13 +9,16 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: white;
   }
 
   &__prefix {
     padding-right: 4px;
+    color: white;
   }
 
   &__suffix {
     padding-left: 4px;
+    color: white;
   }
 }
