@@ -34,6 +34,7 @@ import {
   VIEW_QUOTE_ROUTE,
   LOADING_QUOTES_ROUTE,
 } from '../../../helpers/constants/routes';
+import { activeChainsInfo } from '../../../../types/chains'
 
 import {
   fetchQuotesAndSetQuoteState,
@@ -121,89 +122,57 @@ const fuseSearchKeys = [
 const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
-// todo: put this into a types location
-const chains = [
-  {
-    chainName: 'Polygon', 
-    tokenSymbol: 'MATIC',
-    providerName: 'https://matic-mumbai.chainstacklabs.com',
-    stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
-    stargateID: 10109,
-    metamaskChainID: "0x1f41"
-  },
-  {
-    chainName: 'Goerli',
-    tokenSymbol: 'ETH',
-    providerName: 'https://rpc.ankr.com/eth_goerli',
-    stargateAddress: '0xdb19Ad528F4649692B92586828346beF9e4a3532',
-    stargateID: 10121,
-    metamaskChainID: '0x5'
-  },
-  {
-    chainName: 'c',
-    tokenSymbol: 'ETH',
-    providerName: 'https://goerli-rollup.arbitrum.io/rpc',
-    stargateAddress: '0x7612aE2a34E5A363E137De748801FB4c86499152',
-    stargateID: 10143,
-    metamaskChainID: '0x66eed'
-  },
-  {
-    chainName: 'Optimism',
-    tokenSymbol: 'ETH',
-    providerName: 'https://mainnet.optimism.io', // fix
-    stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
-    stargateID: 10132,
-    metamaskChainID: '0x1a4'
-  }
-]
 
-export async function reviewBridge (c, sourceChain, destinationChain) {
-  if (sourceChain === undefined || destinationChain === undefined) {
+export async function reviewBridge (address, srcChain, dstChain) {
+  if (srcChain === undefined || dstChain === undefined) {
     return
   }
 
-  const srcChain = chains.find((chain) => chain.chainName === sourceChain.name);
-  const dstChain = chains.find((chain) => chain.metamaskChainID === destinationChain.name);
+  // const srcChain = activeChainsInfo.find((chain) => chain.chainName === sourceChain.name);
+  // const dstChain = activeChainsInfo.find((chain) => chain.chainName === destinationChain.name);
 
-  let provider = ethers.getDefaultProvider(srcChain.providerName)
-  // TODO: get private key
-  let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
+  console.log("Source Chain: ", srcChain)
+  console.log("Destination Chain: ", dstChain)
 
-  //Starting Chain
-  let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI)
+  // let provider = ethers.getDefaultProvider(srcChain.providerName)
+  // // TODO: get private key
+  // let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
 
-  let signer = await wallet.connect(provider)
+  // //Starting Chain
+  // let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI)
 
-  stargateContract = await stargateContract.connect(signer)
+  // let signer = await wallet.connect(provider)
 
-    let messageFee = ethers.utils.parseEther('0.0025');  
-    let quantity = ethers.utils.parseEther('0.001'); 
-    let min = ethers.utils.parseEther('0.0005');
-    let message = ethers.utils.formatBytes32String(""); 
-  const swapTxn = await stargateContract.swapETH(
-    dstChain.stargateID, // goerli
-    address, //user's address
-    address, //user's address
-    quantity,
-    min,
-    {value: messageFee, gasLimit: 1000000}
-  ) // errors not logged properly from stargate 
+  // stargateContract = await stargateContract.connect(signer)
+
+  //   let messageFee = ethers.utils.parseEther('0.0025');  
+  //   let quantity = ethers.utils.parseEther('0.001'); 
+  //   let min = ethers.utils.parseEther('0.0005');
+  //   let message = ethers.utils.formatBytes32String(""); 
+  // const swapTxn = await stargateContract.swapETH(
+  //   dstChain.stargateID, // goerli
+  //   address, //user's address
+  //   address, //user's address
+  //   quantity,
+  //   min,
+  //   {value: messageFee, gasLimit: 1000000}
+  // ) // errors not logged properly from stargate 
   
-  console.log(swapTxn)
+  // console.log(swapTxn)
   
-  if (swapTxn) {
-    return {
-      srcChain,
-      dstChain,
-      txHash: swapTxn.hash,
-      value: ethers.utils.formatEther(swapTxn.value.toNumber()),
-      success: true
-    }
-  } else {
-    return {      
-      success: false
-    }
-  }
+  // if (swapTxn) {
+  //   return {
+  //     srcChain,
+  //     dstChain,
+  //     txHash: swapTxn.hash,
+  //     value: ethers.utils.formatEther(swapTxn.value.toNumber()),
+  //     success: true
+  //   }
+  // } else {
+  //   return {      
+  //     success: false
+  //   }
+  // }
 }
 
 export default function BuildQuote({
@@ -219,6 +188,7 @@ export default function BuildQuote({
   const [fetchedTokenExchangeRate, setFetchedTokenExchangeRate] =
     useState(undefined);
   const [verificationClicked, setVerificationClicked] = useState(false);
+  const [reviewClicked , setReviewClicked] = useState(false);
 
   const isFeatureFlagLoaded = useSelector(getIsFeatureFlagLoaded);
   const keyring = useSelector(getMetaMaskKeyrings)
@@ -302,35 +272,6 @@ export default function BuildQuote({
     tokenList,
   );
 
-  let tokensToSearchSwapFrom = [
-    {
-      address: '0x0000000000000000000000000000000000000000',
-      decimals: 18,
-      iconUrl: "./images/black-eth-logo.svg",
-      name: "Goerli",
-      symbol: "Goerli",
-      primaryLabel: "Goerli",
-      secondaryLabel: "ETH",
-    },
-    {
-      address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      decimals: 18,
-      iconUrl: "./images/black-eth-logo.svg",
-      name: "Arbitrum",
-      symbol: "Arbitrum",
-      primaryLabel: "Arbitrum",
-      secondaryLabel: "ETH",
-    },
-    {
-      address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-      decimals: 18,
-      iconUrl: "./images/black-eth-logo.svg",
-      name: "Optimism",
-      symbol: "Optimism",
-      primaryLabel: "Optimism",
-      secondaryLabel: "ETH",
-    },
-  ]
   // let temp = useTokensToSearch({
   //   usersTokens: memoizedUsersTokens,
   //   topTokens: topAssets,
@@ -338,10 +279,10 @@ export default function BuildQuote({
   //   tokenBucketPriority: TOKEN_BUCKET_PRIORITY.OWNED,
   // });
   // console.log(temp);
-  // tokensToSearchSwapFrom = tokensToSearchSwapFrom.filter(
+  // chains = activeChainsInfo.filter(
   //   (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
   // );
-  let tokensToSearchSwapTo = tokensToSearchSwapFrom
+  let tokensToSearchSwapTo = activeChainsInfo
   // let tokensToSearchSwapTo = useTokensToSearch({
   //   usersTokens: memoizedUsersTokens,
   //   topTokens: topAssets,
@@ -352,7 +293,7 @@ export default function BuildQuote({
   //   (token) => token.symbol === 'ETH' || token.symbol === 'MATIC',
   // );
   const selectedToToken =
-    tokensToSearchSwapFrom.find(({ address }) =>
+    activeChainsInfo.find(({ address }) =>
       isEqualCaseInsensitive(address, toToken?.address),
     ) || toToken;
   const toTokenIsNotDefault =
@@ -719,7 +660,7 @@ export default function BuildQuote({
         </div>
         <DropdownInputPair
           onSelect={onFromSelect}
-          itemsToSearch={tokensToSearchSwapFrom}
+          itemsToSearch={activeChainsInfo}
           onInputChange={(value) => {
             /* istanbul ignore next */
             onInputChange(value, fromTokenBalance);
@@ -730,7 +671,7 @@ export default function BuildQuote({
           maxListItems={30}
           loading={
             loading &&
-            (!tokensToSearchSwapFrom?.length ||
+            (!activeChainsInfo?.length ||
               !topAssets ||
               !Object.keys(topAssets).length)
           }
@@ -811,97 +752,33 @@ export default function BuildQuote({
             shouldSearchForImports
           />
         </div>
-        {toTokenIsNotDefault &&
-          (occurrences < 2 ? (
-            <ActionableMessage
-              type={occurrences === 1 ? 'warning' : 'danger'}
-              message={
-                <div className="build-quote__token-verification-warning-message">
-                  <div className="build-quote__bold">
-                    {occurrences === 1
-                      ? t('swapTokenVerificationOnlyOneSource')
-                      : t('swapTokenVerificationAddedManually')}
-                  </div>
-                  <div>{tokenVerificationDescription}</div>
-                </div>
-              }
-              primaryAction={
-                /* istanbul ignore next */
-                verificationClicked
-                  ? null
-                  : {
-                      label: t('continue'),
-                      onClick: () => setVerificationClicked(true),
-                    }
-              }
-              withRightButton
-              infoTooltipText={
-                blockExplorerTokenLink &&
-                t('swapVerifyTokenExplanation', [blockExplorerLabel])
-              }
-            />
-          ) : (
-            <div className="build-quote__token-message">
-              <span
-                className="build-quote__bold"
-                key="token-verification-bold-text"
-              >
-                {t('swapTokenVerificationSources', [occurrences])}
-              </span>
-              {blockExplorerTokenLink && (
-                <>
-                  {t('swapTokenVerificationMessage', [
-                    <a
-                      className="build-quote__token-etherscan-link"
-                      key="build-quote-etherscan-link"
-                      onClick={() => {
-                        /* istanbul ignore next */
-                        trackEvent({
-                          event: 'Clicked Block Explorer Link',
-                          category: EVENT.CATEGORIES.SWAPS,
-                          properties: {
-                            link_type: 'Token Tracker',
-                            action: 'Swaps Confirmation',
-                            block_explorer_domain: getURLHostName(
-                              blockExplorerTokenLink,
-                            ),
-                          },
-                        });
-                        global.platform.openTab({
-                          url: blockExplorerTokenLink,
-                        });
-                      }}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {blockExplorerLabel}
-                    </a>,
-                  ])}
-                  <InfoTooltip
-                    position="top"
-                    contentText={t('swapVerifyTokenExplanation', [
-                      blockExplorerLabel,
-                    ])}
-                    containerClassName="build-quote__token-tooltip-container"
-                    key="token-verification-info-tooltip"
-                  />
-                </>
-              )}
-            </div>
-          ))}
       </div>
-      <SwapsFooter
+      {!reviewClicked && (
+        <SwapsFooter
+        onSubmit={
+          /* istanbul ignore next */
+          () => {
+            setReviewClicked(true);
+          }
+        }
+        submitText={"Review Bridge"}
+        hideCancel
+      /> )
+      }
+      {reviewClicked && (
+        <SwapsFooter
         onSubmit={
           /* istanbul ignore next */
           () => {
             if (selectedFromToken && selectedToToken) {
-              onSubmit(selectedAccountAddress, selectedFromToken, selectedToToken);
+              reviewBridge(selectedAccountAddress, selectedFromToken, selectedToToken);
             }
           }
         }
         submitText={"Submit Bridge"}
         hideCancel
-      />
+      /> )
+      }
     </div>
   );
 }

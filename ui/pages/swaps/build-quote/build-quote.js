@@ -108,6 +108,7 @@ import { isEqualCaseInsensitive } from '../../../../shared/modules/string-utils'
 import { hexToDecimal } from '../../../../shared/lib/metamask-controller-utils';
 import { calcTokenAmount } from '../../../../shared/lib/transactions-controller-utils';
 import { shouldEnableDirectWrapping } from '../../../../shared/lib/swaps-utils';
+import { activeChainsInfo } from '../../../../types/chains'
 
 const fuseSearchKeys = [
   { name: 'name', weight: 0.499 },
@@ -213,7 +214,7 @@ export default function BuildQuote({
     tokenList,
   );
 
-  const tokensToSearchSwapFrom = useTokensToSearch({
+  const chains = useTokensToSearch({
     usersTokens: memoizedUsersTokens,
     topTokens: topAssets,
     shuffledTokensList,
@@ -226,7 +227,7 @@ export default function BuildQuote({
     tokenBucketPriority: TOKEN_BUCKET_PRIORITY.TOP,
   });
   const selectedToToken =
-    tokensToSearchSwapFrom.find(({ address }) =>
+  activeChainsInfo.find(({ address }) =>
       isEqualCaseInsensitive(address, toToken?.address),
     ) || toToken;
   const toTokenIsNotDefault =
@@ -677,7 +678,7 @@ export default function BuildQuote({
         </div>
         <DropdownInputPair
           onSelect={onFromSelect}
-          itemsToSearch={tokensToSearchSwapFrom}
+          itemsToSearch={activeChainsInfo}
           onInputChange={(value) => {
             /* istanbul ignore next */
             onInputChange(value, fromTokenBalance);
@@ -688,7 +689,7 @@ export default function BuildQuote({
           maxListItems={30}
           loading={
             loading &&
-            (!tokensToSearchSwapFrom?.length ||
+            (!activeChainsInfo?.length ||
               !topAssets ||
               !Object.keys(topAssets).length)
           }

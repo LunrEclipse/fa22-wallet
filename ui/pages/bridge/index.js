@@ -271,7 +271,6 @@ export default function Swap() {
         token_to: fetchParams?.destinationTokenInfo?.symbol,
         slippage: fetchParams?.slippage,
         custom_slippage: fetchParams?.slippage !== 2,
-        current_screen: pathname.match(/\/swaps\/(.+)/u)[1],
         is_hardware_wallet: hardwareWalletUsed,
         hardware_wallet_type: hardwareWalletType,
         stx_enabled: smartTransactionsEnabled,
@@ -395,9 +394,6 @@ export default function Swap() {
           <div
             className="swaps__header-cancel"
             onClick={async () => {
-              clearTemporaryTokenRef.current();
-              dispatch(clearSwapsState());
-              await dispatch(resetBackgroundSwapsState());
               history.push(DEFAULT_ROUTE);
             }}
           >
