@@ -121,19 +121,12 @@ export default class TxGasUtil {
 
   // take in gas estimate on current chain // by unit 
   async getGasPricesOnOtherChains(gasObj, fromAddress) {
-    
+
     var gasNeeded = 9999; // TODO: this sbould get passed in from send.js/getIsBalanceInsufficient
 
     var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
     var balance = await api.account.balance(fromAddress);
-    // var balanceData = balance.then((balanceData) => {
-    //   return balanceData;
-    // });
-
-
-    // if (gasNeeded <= balanceMATIC) {
-    //   // TODO: perform MATIC --> ETH swap
-    // }
+    
     return [{balance: balance.result, chain: 'Polygon'}, {balance: 100, chain: 'Arbitrum'}, {balance: 21000, chain: 'Goerli'}, {balance: 120312, chain: 'Optimism'}]; // todo: update w proper names
   }
 }

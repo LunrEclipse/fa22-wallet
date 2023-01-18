@@ -2548,7 +2548,6 @@ export function getSendAmount(state) {
  * @type {Selector<Array>}
  */
 export async function getIsBalanceInsufficient(state) {
-  // call tx-gas-utils getGasPricesOnOtherChains(getCurrentDraftTransaction(state).gas)
   const gasUtils = new TxGasUtil(state.metamask.provider)
   let outputArr = []; 
   if (getCurrentDraftTransaction(state).gas?.error === INSUFFICIENT_FUNDS_ERROR) {

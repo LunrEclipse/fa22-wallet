@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import InfoTooltip from '../info-tooltip';
 import InfoTooltipIcon from '../info-tooltip/info-tooltip-icon';
+import { activeChainsInfo } from '../../../../types/chains'
 
 const CLASSNAME_WARNING = 'actionable-message--warning';
 const CLASSNAME_DANGER = 'actionable-message--danger';
@@ -24,6 +25,8 @@ export default function ActionableMessage({
   className = '',
   infoTooltipText = '',
   withRightButton = false,
+  gasOptions,
+  setSourceChain,
   type = 'default',
   useIcon = false,
   icon,
@@ -31,6 +34,7 @@ export default function ActionableMessage({
   roundedButtons,
   dataTestId,
 }) {
+  const [destinationChain, setDestinationChain] = useState('')
   const actionableMessageClassName = classnames(
     'actionable-message',
     typeHash[type],
@@ -38,10 +42,9 @@ export default function ActionableMessage({
     className,
     { 'actionable-message--with-icon': useIcon },
   );
-
   const onlyOneAction =
     (primaryAction && !secondaryAction) || (secondaryAction && !primaryAction);
-
+  
   return (
     <div className={actionableMessageClassName} data-testid={dataTestId}>
       {useIcon ? icon || <InfoTooltipIcon fillColor={iconFillColor} /> : null}
@@ -53,6 +56,12 @@ export default function ActionableMessage({
         />
       )}
       <div className="actionable-message__message">{message}</div>
+      {gasOptions !== undefined &&  (
+        gasOptions.map((swap) => (
+          <div key={swap.chain} onClick={() => setSourceChain(swap.chain)}>
+            {swap.chain} Balance: {swap.balance}
+          </div>
+      )))}  
       {primaryActionV2 && (
         <button
           className="actionable-message__action-v2"
@@ -142,6 +151,9 @@ ActionableMessage.propTypes = {
    * change text align to left and button to bottom right
    */
   withRightButton: PropTypes.bool,
+  // info imported by B@B for bridging
+  gasOnOtherChains: PropTypes.array,
+  setSourceChain: PropTypes.func,
   /**
    * Add tooltip and custom message
    */
