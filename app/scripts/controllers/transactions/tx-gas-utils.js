@@ -3,6 +3,7 @@ import log from 'loglevel';
 import { addHexPrefix } from 'ethereumjs-util';
 import { cloneDeep } from 'lodash';
 import { hexToBn, BnMultiplyByFraction, bnToHex } from '../../lib/util';
+import axios from 'axios';
 
 /**
  * Result of gas analysis, including either a gas estimate for a successful analysis, or
@@ -124,17 +125,37 @@ export default class TxGasUtil {
     
     var gasNeeded = 9999; // TODO: this sbould get passed in from send.js/getIsBalanceInsufficient
 
+    // polygon balance
     var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
     var balance = await api.account.balance(fromAddress);
-    // var balanceData = balance.then((balanceData) => {
-    //   return balanceData;
-    // });
+    var polyBalance = balance.result;
+
+    // arbitrum balance
+    var arbBalance = await axios.get("https://api.arbiscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=WMKZ9X5YUTEV5ZYK27CYMKTDD6SPBTZM88")
+    .then(function (response) {
+      const arbBal = response.data.result;
+      const arbBalFixed = (arbBal / 1000000000000000000).toFixed(5);
+      return arbBalFixed;
+    })
+
+    // goerli balance
+    var goBalance = await axios.get("https://api-goerli.etherscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=YQMRKMD93AIZUWZVJ8YXWXWJV65PGG8J3F")
+    .then(function (response) {
+      const goBal = response.data.result;
+      const goBalFixed = (goBal / 1000000000000000000).toFixed(5);
+      return goBalFixed;
+    })
+
+    // optimism balance
+    var optbalance = await axios.get("https://api-optimistic.etherscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=KPHMQMAVMM6CBH7C9SFVSBJQ9SDDSDW851")
+    .then(function (response) {
+      const optBal = response.data.result;
+      const optBalFixed = (optBal / 1000000000000000000).toFixed(5);
+      return optBalFixed;
+    })
 
 
-    // if (gasNeeded <= balanceMATIC) {
-    //   // TODO: perform MATIC --> ETH swap
-    // }
-    return [{balance: balance.result, chain: 'Polygon'}, {balance: 100, chain: 'Arbitrum'}, {balance: 21000, chain: 'Goerli'}, {balance: 120312, chain: 'Optimism'}]; // todo: update w proper names
+    return [{balance: polyBalance, chain: 'Polygon'}, {balance: arbBalance, chain: 'Arbitrum'}, {balance: goBalance, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
   }
 }
 
@@ -149,3 +170,7 @@ export async function GetPolygonBalance(addr) {
 
   return balanceData.result;
 }
+
+// https://api.arbiscan.io/api?module=account&action=balance&address=0xC76b9d4B13717f959ea45Ec6e3Db9C3F9304d7d5&tag=latest&apikey=WMKZ9X5YUTEV5ZYK27CYMKTDD6SPBTZM88
+// https://api-optimistic.etherscan.io/api?module=account&action=balance&address=0x33e0e07ca86c869ade3fc9de9126f6c73dad105e&tag=latest&apikey=KPHMQMAVMM6CBH7C9SFVSBJQ9SDDSDW851
+// https://api-goerli.etherscan.io/api?module=account&action=balance&address=0x690B9A9E9aa1C9dB991C7721a92d351Db4FaC990&tag=latest&apikey=YQMRKMD93AIZUWZVJ8YXWXWJV65PGG8J3F
