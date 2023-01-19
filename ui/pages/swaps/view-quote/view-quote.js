@@ -65,6 +65,7 @@ import {
   checkNetworkAndAccountSupports1559,
   getUSDConversionRate,
   getSelectedAddress,
+  getProvider,
 } from '../../../selectors';
 import { getNativeCurrency, getTokens } from '../../../ducks/metamask/metamask';
 
@@ -116,6 +117,7 @@ import {
 } from '../../../../shared/lib/transactions-controller-utils';
 import { calcTokenValue } from '../../../../shared/lib/swaps-utils';
 import ViewQuotePriceDifference from './view-quote-price-difference';
+import TxGasUtil from '../../../../app/scripts/controllers/transactions/tx-gas-utils';
 
 let intervalId;
 
@@ -130,6 +132,9 @@ export default function ViewQuote() {
   const [selectQuotePopoverShown, setSelectQuotePopoverShown] = useState(false);
   const [warningHidden, setWarningHidden] = useState(false);
   const [originalApproveAmount, setOriginalApproveAmount] = useState(null);
+  const [gasOnOtherChains, setGasOnOtherChains] = useState([]);
+  const [sourceChain, setSourceChain] = useState('');
+
   // We need to have currentTimestamp in state, otherwise it would change with each rerender.
   const [currentTimestamp] = useState(Date.now());
 
@@ -168,6 +173,8 @@ export default function ViewQuote() {
   const networkAndAccountSupports1559 = useSelector(
     checkNetworkAndAccountSupports1559,
   );
+  const activeAccount = useSelector(getSelectedAccount);
+  const provider = useSelector(getProvider);
   const balanceError = useSelector(getBalanceError);
   const fetchParams = useSelector(getFetchParams, isEqual);
   const approveTxParams = useSelector(getApproveTxParams, shallowEqual);
@@ -477,6 +484,20 @@ export default function ViewQuote() {
     currentSmartTransactionsEnabled,
     smartTransactionsOptInStatus,
   ]);
+  // Indicates if we should show to a user a warning about insufficient funds for swapping.
+  const showInsufficientWarning =
+    (balanceError ||
+      tokenBalanceNeeded ||
+      isNotStxAndEthBalanceIsNeeded ||
+      isStxAndEthBalanceIsNeeded) &&
+    !warningHidden;
+
+  const gasUtils = new TxGasUtil(provider)
+  useEffect(() => {
+    if (showInsufficientWarning) {
+      gasUtils.getGasPricesOnOtherChains(gasPrice, activeAccount.address).then((arr) => setGasOnOtherChains(arr))
+    }
+  }, [showInsufficientWarning, gasOnOtherChains]);
 
   useEffect(() => {
     const currentTime = Date.now();
@@ -515,14 +536,6 @@ export default function ViewQuote() {
     currentSmartTransactionsEnabled &&
     smartTransactionsOptInStatus &&
     ethBalanceNeededStx;
-
-  // Indicates if we should show to a user a warning about insufficient funds for swapping.
-  const showInsufficientWarning =
-    (balanceError ||
-      tokenBalanceNeeded ||
-      isNotStxAndEthBalanceIsNeeded ||
-      isStxAndEthBalanceIsNeeded) &&
-    !warningHidden;
 
   const hardwareWalletUsed = useSelector(isHardwareWallet);
   const hardwareWalletType = useSelector(getHardwareWalletType);
@@ -923,15 +936,15 @@ export default function ViewQuote() {
                 message={actionableBalanceErrorMessage}
                 primaryAction={{
                   label: "Bridge",
-                  onClick: () => reviewBridge(getSelectedAddress(state), this.state.chain, this.props.activeNetwork),
+                  onClick: () => reviewBridge(activeAccount.address, sourceChain, provider.chainId, '0.01', '0.1'),
                 }}
+                gasOptions={gasOnOtherChains}
+                setSourceChain={setSourceChain}
                 onClose={
                   /* istanbul ignore next */
                   () => setWarningHidden(true)
                 }
               />
-
-
             </div>
           )}
         </div>

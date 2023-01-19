@@ -27,6 +27,7 @@ export default {
     className: { control: 'text' },
     type: { control: 'text' },
     withRightButton: { control: 'boolean' },
+    gasOptions: { control: 'array'},
     infoTooltipText: { control: 'text' },
     useIcon: { control: 'boolean' },
     iconFillColor: { control: 'color' },

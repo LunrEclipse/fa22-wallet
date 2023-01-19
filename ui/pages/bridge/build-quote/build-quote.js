@@ -20,7 +20,6 @@ import { getTokens, getConversionRate, findKeyringForAddress } from '../../../du
 import InfoTooltip from '../../../components/ui/info-tooltip';
 import Popover from '../../../components/ui/popover';
 import Button from '../../../components/ui/button';
-import ActionableMessage from '../../../components/ui/actionable-message/actionable-message';
 import Box from '../../../components/ui/box';
 import Typography from '../../../components/ui/typography';
 import {
@@ -34,7 +33,6 @@ import {
   VIEW_QUOTE_ROUTE,
   LOADING_QUOTES_ROUTE,
 } from '../../../helpers/constants/routes';
-import { activeChainsInfo } from '../../../../types/chains'
 
 import {
   fetchQuotesAndSetQuoteState,
@@ -113,6 +111,10 @@ import { shouldEnableDirectWrapping } from '../../../../shared/lib/swaps-utils';
 
 import { ethers, signer } from "ethers";
 import stargateABI from "../../../utils/ethRouter"
+import routerABI from "../../../utils/stargateABI"
+
+import { activeChainsInfo } from '../../../../types/chains'
+
 const fuseSearchKeys = [
   { name: 'name', weight: 0.499 },
   { name: 'symbol', weight: 0.499 },
@@ -123,56 +125,54 @@ const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
 
-export async function reviewBridge (address, srcChain, dstChain) {
-  if (srcChain === undefined || dstChain === undefined) {
+export async function reviewBridge (address, sourceChainRaw, destinationChainRaw, amount, balance) {
+  if (sourceChainRaw === undefined || destinationChainRaw === undefined) {
     return
   }
+  console.log(address)
+  const srcChain = activeChainsInfo.find((chain) => chain.name === sourceChainRaw);
+  const dstChain = activeChainsInfo.find((chain) => chain.metamaskChainID === destinationChainRaw);
 
-  // const srcChain = activeChainsInfo.find((chain) => chain.chainName === sourceChain.name);
-  // const dstChain = activeChainsInfo.find((chain) => chain.chainName === destinationChain.name);
+  console.log('dstChain:',  dstChain)
+  console.log('srcChain: ',  srcChain)
+  let provider = ethers.getDefaultProvider(srcChain.providerName)
+  // TODO: get private key
+  let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
 
-  console.log("Source Chain: ", srcChain)
-  console.log("Destination Chain: ", dstChain)
+  //Starting Chain
+  let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI)
 
-  // let provider = ethers.getDefaultProvider(srcChain.providerName)
-  // // TODO: get private key
-  // let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
+  let signer = await wallet.connect(provider)
 
-  // //Starting Chain
-  // let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI)
-
-  // let signer = await wallet.connect(provider)
-
-  // stargateContract = await stargateContract.connect(signer)
-
-  //   let messageFee = ethers.utils.parseEther('0.0025');  
-  //   let quantity = ethers.utils.parseEther('0.001'); 
-  //   let min = ethers.utils.parseEther('0.0005');
-  //   let message = ethers.utils.formatBytes32String(""); 
-  // const swapTxn = await stargateContract.swapETH(
-  //   dstChain.stargateID, // goerli
-  //   address, //user's address
-  //   address, //user's address
-  //   quantity,
-  //   min,
-  //   {value: messageFee, gasLimit: 1000000}
-  // ) // errors not logged properly from stargate 
+  stargateContract = await stargateContract.connect(signer)
+  balance = balance.substring(0, 5)
+  let messageFee = ethers.utils.parseEther(balance.toString());  
+  let quantity = ethers.utils.parseEther(amount.toString()); 
+  let min = ethers.utils.parseEther('0.001');
+  const swapTxn = await stargateContract.swapETH(
+    dstChain.stargateID, // goerli
+    address, //user's address
+    address, //user's address
+    quantity,
+    min,
+    {value: messageFee, gasLimit: 1000000}
+  ) // errors not logged properly from stargate 
   
-  // console.log(swapTxn)
+  console.log(swapTxn)
   
-  // if (swapTxn) {
-  //   return {
-  //     srcChain,
-  //     dstChain,
-  //     txHash: swapTxn.hash,
-  //     value: ethers.utils.formatEther(swapTxn.value.toNumber()),
-  //     success: true
-  //   }
-  // } else {
-  //   return {      
-  //     success: false
-  //   }
-  // }
+  if (swapTxn) {
+    return {
+      srcChain,
+      dstChain,
+      txHash: swapTxn.hash,
+      value: ethers.utils.formatEther(swapTxn.value.toNumber()),
+      success: true
+    }
+  } else {
+    return {      
+      success: false
+    }
+  }
 }
 
 export default function BuildQuote({
@@ -771,7 +771,7 @@ export default function BuildQuote({
           /* istanbul ignore next */
           () => {
             if (selectedFromToken && selectedToToken) {
-              reviewBridge(selectedAccountAddress, selectedFromToken, selectedToToken);
+              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue, fromTokenBalance);
             }
           }
         }

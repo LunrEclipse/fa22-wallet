@@ -214,7 +214,7 @@ export default function BuildQuote({
     tokenList,
   );
 
-  const chains = useTokensToSearch({
+  const tokensToSearchSwapFrom = useTokensToSearch({
     usersTokens: memoizedUsersTokens,
     topTokens: topAssets,
     shuffledTokensList,
@@ -227,7 +227,7 @@ export default function BuildQuote({
     tokenBucketPriority: TOKEN_BUCKET_PRIORITY.TOP,
   });
   const selectedToToken =
-  activeChainsInfo.find(({ address }) =>
+  tokensToSearchSwapFrom.find(({ address }) =>
       isEqualCaseInsensitive(address, toToken?.address),
     ) || toToken;
   const toTokenIsNotDefault =
@@ -678,7 +678,7 @@ export default function BuildQuote({
         </div>
         <DropdownInputPair
           onSelect={onFromSelect}
-          itemsToSearch={activeChainsInfo}
+          itemsToSearch={tokensToSearchSwapFrom}
           onInputChange={(value) => {
             /* istanbul ignore next */
             onInputChange(value, fromTokenBalance);
@@ -689,7 +689,7 @@ export default function BuildQuote({
           maxListItems={30}
           loading={
             loading &&
-            (!activeChainsInfo?.length ||
+            (!tokensToSearchSwapFrom?.length ||
               !topAssets ||
               !Object.keys(topAssets).length)
           }

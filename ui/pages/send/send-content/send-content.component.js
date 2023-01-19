@@ -133,7 +133,7 @@ export default class SendContent extends Component {
           <div className="ens-input send__to-row" key={swap.chain}>
             {swap.chain} Balance: {swap.balance}
             <button style={{ background: '#037dd6' }} onClick={() => 
-              reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork)
+              reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork.chainId, '0.01', '0.1')
               .then((res) => this.setState({transactionResponse: res}))
             }>
               <text style={{ color: 'white' }}>Swap {null} {swap.balance} for {null} ETH </text>
