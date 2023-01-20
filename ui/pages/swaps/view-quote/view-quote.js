@@ -494,14 +494,11 @@ export default function ViewQuote() {
 
   const gasUtils = new TxGasUtil(provider)
   useEffect(() => {
+    // .filter(chain => parseFloat(chain.balance) >= parseFloat(tokenBalanceNeeded))
     if (showInsufficientWarning) {
       gasUtils.getGasPricesOnOtherChains(gasPrice, activeAccount.address).then((arr) => setGasOnOtherChains(arr))
     }
   }, [showInsufficientWarning, gasOnOtherChains]);
-
-  useEffect(() => {
-    gasOnOtherChains.filter(chain => chain.balance > tokenBalanceNeeded);
-  }, [gasOnOtherChains]);
 
   useEffect(() => {
     const currentTime = Date.now();
@@ -940,7 +937,7 @@ export default function ViewQuote() {
                 message={actionableBalanceErrorMessage}
                 primaryAction={{
                   label: "Bridge",
-                  onClick: () => reviewBridge(activeAccount.address, sourceChain, provider.chainId, '0.01', '0.1'),
+                  onClick: () => reviewBridge(activeAccount.address, sourceChain, provider.chainId, tokenBalanceNeeded),
                 }}
                 gasOptions={gasOnOtherChains}
                 tokenBalanceNeeded={tokenBalanceNeeded}

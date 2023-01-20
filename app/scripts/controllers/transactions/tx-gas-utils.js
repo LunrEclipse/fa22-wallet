@@ -122,6 +122,8 @@ export default class TxGasUtil {
 
   // take in gas estimate on current chain // by unit 
   async getGasPricesOnOtherChains(gasObj, fromAddress) {
+    return [{balance: 2, chain: 'Arbitrum'}, {balance: 3, chain: 'Goerli'}, {balance: 4, chain: 'Optimism'}]; // todo: update w proper names
+ 
 
     var gasNeeded = 9999; // TODO: this sbould get passed in from send.js/getIsBalanceInsufficient
 
@@ -131,7 +133,7 @@ export default class TxGasUtil {
     var polyBalance = balance.result;
 
     // arbitrum balance
-    var arbBalance = await axios.get("https://api.arbiscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=WMKZ9X5YUTEV5ZYK27CYMKTDD6SPBTZM88")
+    var arbBalance = await axios.get("https://api-goerli.arbiscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=WMKZ9X5YUTEV5ZYK27CYMKTDD6SPBTZM88")
     .then(function (response) {
       const arbBal = response.data.result;
       const arbBalFixed = (arbBal / 1000000000000000000).toFixed(5);
@@ -154,7 +156,7 @@ export default class TxGasUtil {
       return optBalFixed;
     })
 
-
+    console.log(arbBalance)
     return [{balance: polyBalance, chain: 'Polygon'}, {balance: arbBalance, chain: 'Arbitrum'}, {balance: goBalance, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
   }
 }

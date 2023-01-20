@@ -125,7 +125,7 @@ const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
 
-export async function reviewBridge (address, sourceChainRaw, destinationChainRaw, amount, balance) {
+export async function reviewBridge (address, sourceChainRaw, destinationChainRaw, amount) {
   if (sourceChainRaw === undefined || destinationChainRaw === undefined) {
     return
   }
@@ -145,8 +145,10 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
   let signer = await wallet.connect(provider)
 
   stargateContract = await stargateContract.connect(signer)
-  balance = balance.substring(0, 3)
-  let messageFee = ethers.utils.parseEther(balance.toString());  
+  let fee = parseFloat(amount);
+  fee += 0.25;
+  console.log(fee)
+  let messageFee = ethers.utils.parseEther(fee.toString());  
   let quantity = ethers.utils.parseEther(amount.toString()); 
   let min = ethers.utils.parseEther('0');
   const swapTxn = await stargateContract.swapETH(
@@ -771,7 +773,7 @@ export default function BuildQuote({
           /* istanbul ignore next */
           () => {
             if (selectedFromToken && selectedToToken) {
-              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue, fromTokenBalance);
+              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
             }
           }
         }

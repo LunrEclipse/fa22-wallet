@@ -1,6 +1,6 @@
 .page-container {
   width: 408px;
-  background-color: var(--color-background-default);
+  background-color: black;
   box-shadow: var(--shadow-size-xs) var(--color-shadow-default);
   z-index: 25;
   display: flex;
@@ -194,7 +194,7 @@
   .page-container {
     height: 100%;
     width: 100%;
-    background-color: var(--color-background-default);
+    background-color: black;
     border-radius: 0;
     flex: 1;
     overflow-y: auto;

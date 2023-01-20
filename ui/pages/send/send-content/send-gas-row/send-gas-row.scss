@@ -4,8 +4,8 @@
   height: 54px;
   border: 1px solid var(--color-border-default);
   border-radius: 4px;
-  background-color: var(--color-background-default);
-  color: var(--color-text-muted);
+  background-color: black;
+  color: white;
   padding: 8px 10px;
   position: relative;
 
@@ -16,7 +16,7 @@
   &__input {
     @include Paragraph;
 
-    color: var(--color-text-muted);
+    color: white;
     border: none;
     max-width: 22ch;
   }
@@ -24,7 +24,7 @@
   &__primary-currency {
     @include Paragraph;
 
-    color: var(--color-text-muted);
+    color: white;
     font-weight: 400;
   }
 
@@ -36,7 +36,7 @@
   &__converted-currency {
     @include H7;
 
-    color: var(--color-text-muted);
+    color: white;
   }
 
   &__input-wrapper {
@@ -64,7 +64,7 @@
 
   &__currency-symbol {
     margin-top: 1px;
-    color: var(--color-text-muted);
+    color: white;
   }
 
   .react-numeric-input {

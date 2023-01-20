@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import ImportTokenLink from '../import-token-link';
@@ -84,6 +84,7 @@ const AssetList = ({ onClickAsset }) => {
         identiconBorder
       />
       <TokenList
+        activeTokenSymbol={primaryCurrencyProperties.suffix}
         onTokenClick={(tokenAddress) => {
           onClickAsset(tokenAddress);
           trackEvent({

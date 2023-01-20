@@ -5,7 +5,7 @@
     position: relative;
     display: flex;
     justify-content: center;
-    background-color: var(--color-background-alternative);
+    background-color: black;
     border-bottom: none;
     padding: 14px 0 3px 0;
 
@@ -48,8 +48,9 @@
     margin: 0;
     padding: 0.5rem;
     flex: 0 0 auto;
-    background-color: var(--color-background-alternative);
-    border-bottom: 1px solid var(--color-border-muted);
+    background-color: black;
+    border-bottom: white;
+    color: white
   }
 
   &__select-recipient-wrapper {
@@ -57,6 +58,7 @@
 
     flex: 1 1 auto;
     height: 0;
+    background-color: black;
 
     &__list {
       overflow-y: auto;
@@ -67,7 +69,7 @@
         @extend %row-nowrap;
 
         padding: 1rem;
-        border-bottom: 1px solid var(--color-border-muted);
+        border-bottom: 1px solid white;
         border-radius: 0;
         align-items: center;
         justify-content: flex-start;
@@ -93,7 +95,7 @@
 
         padding: 0.5rem;
         text-align: center;
-        border-bottom: 1px solid var(--color-border-muted);
+        border-bottom: 1px solid white;
         justify-content: flex-start;
       }
     }
@@ -105,13 +107,13 @@
     &__group-label {
       @include H8;
 
-      background-color: var(--color-background-alternative);
-      color: var(--color-text-alternative);
+      background-color: black;
+      color: white;
       padding: 0.5rem 1rem;
-      border-bottom: 1px solid var(--color-border-muted);
+      border-bottom: 1px solid white;
 
       &:first-of-type {
-        border-top: 1px solid var(--color-border-muted);
+        border-top: 1px solid white;
       }
     }
 
@@ -121,7 +123,7 @@
 
       padding: 0.75rem 1rem;
       align-items: center;
-      border-bottom: 1px solid var(--color-border-muted);
+      border-bottom: 1px solid white;
       cursor: pointer;
 
       &:hover {
@@ -147,18 +149,18 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-        color: var(--color-text-default);
+        color: white;
       }
 
       &__subtitle {
         @include H8;
 
-        color: var(--color-text-muted);
+        color: white;
       }
     }
 
     &__group-item--selected {
-      border: 2px solid var(--color-primary-default);
+      border: 2px solid black;
       border-radius: 8px;
     }
   }
@@ -166,6 +168,7 @@
 
 .ens-input {
   @extend %row-nowrap;
+  background-color: black;
 
   &__wrapper {
     @extend %row-nowrap;
@@ -173,14 +176,14 @@
     flex: 1 1 auto;
     width: 0;
     align-items: center;
-    background: var(--color-background-default);
+    background: black;
     border-radius: 0.5rem;
     padding: 0.75rem 0.5rem;
-    border: 1px solid var(--color-border-muted);
+    border: 1px solid white;
     transition: border-color 150ms ease-in-out;
 
     &:focus-within {
-      border-color: var(--color-border-default);
+      border-color: white;
     }
 
     &__status-icon {
@@ -194,11 +197,11 @@
       width: 0;
       border: 0;
       outline: none;
-      color: var(--color-text-default);
-      background-color: var(--color-background-default);
+      color: white;
+      background-color: black;
 
       &::placeholder {
-        color: var(--color-text-muted);
+        color: white;
       }
     }
 
@@ -214,7 +217,7 @@
     }
 
     &--valid {
-      border-color: var(--color-primary-default);
+      border-color: white;
 
       .ens-input__wrapper {
         &__input {
@@ -222,7 +225,7 @@
 
           @include H7;
 
-          color: var(--color-primary-default);
+          color: white;
         }
       }
     }
@@ -241,7 +244,7 @@
     &__subtitle {
       @include H7;
 
-      color: var(--color-text-default);
+      color: white;
       margin-top: 0.25rem;
     }
   }

@@ -59,11 +59,11 @@ export default function ActionableMessage({
       <div className="actionable-message__message">{message}</div>
       {gasOptions !== undefined &&  (
         gasOptions.map((swap) => (
-          <div class="" onClick={() => setSourceChain(swap.chain)}>
-            <div key={swap.chain} >
+          <div onClick={() => setSourceChain(swap.chain)} key={swap.chain}>
+            <div>
               Swap {tokenBalanceNeeded} from {swap.chain}
             </div>
-            <div key={swap.chain}>
+            <div>
               Balance: {swap.balance}
             </div>
           </div>
@@ -159,7 +159,6 @@ ActionableMessage.propTypes = {
    */
   withRightButton: PropTypes.bool,
   // info imported by B@B for bridging
-  gasOnOtherChains: PropTypes.array,
   setSourceChain: PropTypes.func,
   /**
    * Add tooltip and custom message
