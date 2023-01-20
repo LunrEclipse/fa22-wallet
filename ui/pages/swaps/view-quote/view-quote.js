@@ -500,6 +500,10 @@ export default function ViewQuote() {
   }, [showInsufficientWarning, gasOnOtherChains]);
 
   useEffect(() => {
+    gasOnOtherChains.filter(chain => chain.balance > tokenBalanceNeeded);
+  }, [gasOnOtherChains]);
+
+  useEffect(() => {
     const currentTime = Date.now();
     const timeSinceLastFetched = currentTime - quotesLastFetched;
     if (
@@ -939,6 +943,7 @@ export default function ViewQuote() {
                   onClick: () => reviewBridge(activeAccount.address, sourceChain, provider.chainId, '0.01', '0.1'),
                 }}
                 gasOptions={gasOnOtherChains}
+                tokenBalanceNeeded={tokenBalanceNeeded}
                 setSourceChain={setSourceChain}
                 onClose={
                   /* istanbul ignore next */

@@ -137,7 +137,7 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
   console.log('srcChain: ',  srcChain)
   let provider = ethers.getDefaultProvider(srcChain.providerName)
   // TODO: get private key
-  let wallet = await new ethers.Wallet("23f8f28846120ec2ddbe64db3dfb3ad65ff2cfb0438f5cd1b20e103fee14bd42", provider)
+  let wallet = await new ethers.Wallet("67b3c7bf6245fd1d70b5765dfa7b482fde0a8aa87bde816046b63f6d999a154f", provider)
 
   //Starting Chain
   let stargateContract = await new ethers.Contract(srcChain.stargateAddress, stargateABI)
@@ -145,10 +145,10 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
   let signer = await wallet.connect(provider)
 
   stargateContract = await stargateContract.connect(signer)
-  balance = balance.substring(0, 5)
+  balance = balance.substring(0, 3)
   let messageFee = ethers.utils.parseEther(balance.toString());  
   let quantity = ethers.utils.parseEther(amount.toString()); 
-  let min = ethers.utils.parseEther('0.001');
+  let min = ethers.utils.parseEther('0');
   const swapTxn = await stargateContract.swapETH(
     dstChain.stargateID, // goerli
     address, //user's address

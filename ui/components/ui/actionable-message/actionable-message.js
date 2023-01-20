@@ -28,6 +28,7 @@ export default function ActionableMessage({
   gasOptions,
   setSourceChain,
   type = 'default',
+  tokenBalanceNeeded,
   useIcon = false,
   icon,
   iconFillColor = '',
@@ -58,8 +59,13 @@ export default function ActionableMessage({
       <div className="actionable-message__message">{message}</div>
       {gasOptions !== undefined &&  (
         gasOptions.map((swap) => (
-          <div key={swap.chain} onClick={() => setSourceChain(swap.chain)}>
-            {swap.chain} Balance: {swap.balance}
+          <div class="" onClick={() => setSourceChain(swap.chain)}>
+            <div key={swap.chain} >
+              Swap {tokenBalanceNeeded} from {swap.chain}
+            </div>
+            <div key={swap.chain}>
+              Balance: {swap.balance}
+            </div>
           </div>
       )))}  
       {primaryActionV2 && (
@@ -147,6 +153,7 @@ ActionableMessage.propTypes = {
    * change color theme for the component that already predefined in css
    */
   type: PropTypes.oneOf(Object.keys(typeHash)),
+  tokenBalanceNeeded: PropTypes.string,
   /**
    * change text align to left and button to bottom right
    */
