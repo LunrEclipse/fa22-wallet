@@ -128,8 +128,8 @@ let timeoutIdForQuotesPrefetching;
 export async function reviewBridge (address, sourceChainRaw, destinationChainRaw, amount) {
   if (sourceChainRaw === undefined || destinationChainRaw === undefined) {
     return
-  }
-  console.log(address)
+  };
+  console.log(amount)
   const srcChain = activeChainsInfo.find((chain) => chain.name === sourceChainRaw);
   const dstChain = activeChainsInfo.find((chain) => chain.metamaskChainID === destinationChainRaw);
 
@@ -273,6 +273,14 @@ export default function BuildQuote({
     chainId,
     tokenList,
   );
+  // useEffect(() => {
+  //   let token = activeChainsInfo.find(({ address }) =>
+  //     isEqualCaseInsensitive(address, toToken?.address),
+  //   )
+  //   selectedFromToken.iconUrl = token.iconUrl;
+  //   console.log(selectedFromToken.iconUrl)
+  // }, [selectedFromToken]);
+
 
   // let temp = useTokensToSearch({
   //   usersTokens: memoizedUsersTokens,
@@ -769,11 +777,12 @@ export default function BuildQuote({
       }
       {reviewClicked && (
         <SwapsFooter
+        disabled={!fromTokenError && balanceError}
         onSubmit={
           /* istanbul ignore next */
           () => {
             if (selectedFromToken && selectedToToken) {
-              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
+              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, hexToDecimal(fromTokenInputValue) / 1000000000000000000);
             }
           }
         }

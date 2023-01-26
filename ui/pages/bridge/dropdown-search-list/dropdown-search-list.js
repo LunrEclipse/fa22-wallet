@@ -138,7 +138,9 @@ export default function DropdownSearchList({
       !isEqual(externallySelectedItem, selectedItem)
     ) {
       setSelectedItem(externallySelectedItem);
+      console.log('if', externallySelectedItem);
     } else if (prevExternallySelectedItem && !externallySelectedItem) {
+      console.log('elif', externallySelectedItem);
       setSelectedItem(null);
     }
   }, [externallySelectedItem, selectedItem, prevExternallySelectedItem]);

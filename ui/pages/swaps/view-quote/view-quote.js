@@ -19,7 +19,6 @@ import { useEqualityCheck } from '../../../hooks/useEqualityCheck';
 import { usePrevious } from '../../../hooks/usePrevious';
 import { useGasFeeInputs } from '../../../hooks/gasFeeInput/useGasFeeInputs';
 import { MetaMetricsContext } from '../../../contexts/metametrics';
-import { reviewBridge } from '../../bridge/build-quote/build-quote';
 import FeeCard from '../fee-card';
 import {
   FALLBACK_GAS_MULTIPLIER,
@@ -935,13 +934,11 @@ export default function ViewQuote() {
             <div>
               <ActionableMessage
                 message={actionableBalanceErrorMessage}
-                primaryAction={{
-                  label: "Bridge",
-                  onClick: () => reviewBridge(activeAccount.address, sourceChain, provider.chainId, tokenBalanceNeeded),
-                }}
+                
+                account={activeAccount.addres}
+                dstChain={provider.chainId}
                 gasOptions={gasOnOtherChains}
                 tokenBalanceNeeded={tokenBalanceNeeded}
-                setSourceChain={setSourceChain}
                 onClose={
                   /* istanbul ignore next */
                   () => setWarningHidden(true)

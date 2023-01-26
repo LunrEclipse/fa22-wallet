@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import InfoTooltip from '../info-tooltip';
 import InfoTooltipIcon from '../info-tooltip/info-tooltip-icon';
 import { activeChainsInfo } from '../../../../types/chains'
+import { reviewBridge } from '../../../pages/bridge/build-quote/build-quote';
 
 const CLASSNAME_WARNING = 'actionable-message--warning';
 const CLASSNAME_DANGER = 'actionable-message--danger';
@@ -26,14 +27,16 @@ export default function ActionableMessage({
   infoTooltipText = '',
   withRightButton = false,
   gasOptions,
-  setSourceChain,
   type = 'default',
   tokenBalanceNeeded,
   useIcon = false,
   icon,
+  account,
+  dstChain,
   iconFillColor = '',
   roundedButtons,
   dataTestId,
+  onClose,
 }) {
   const [destinationChain, setDestinationChain] = useState('')
   const actionableMessageClassName = classnames(
@@ -59,14 +62,28 @@ export default function ActionableMessage({
       <div className="actionable-message__message">{message}</div>
       {gasOptions !== undefined &&  (
         gasOptions.map((swap) => (
-          <div onClick={() => setSourceChain(swap.chain)} key={swap.chain}>
-            <div>
-              Swap {tokenBalanceNeeded} from {swap.chain}
-            </div>
-            <div>
-              Balance: {swap.balance}
-            </div>
-          </div>
+          <button onMouseOver="this.style.background-color='gray'"
+            // class="actionable-message__bridgeOptions"
+            style={{ 
+              'display': 'flex', 
+              'flex-direction': 'row', 
+              'justify-content': 'space-between',
+              'background-color': 'black', 
+              'color': 'white',
+              'border-radius': '8px',
+              'padding': '4px 8px 4px 8px',
+              'margin': '8px 12px 8px 12px'
+              }} 
+
+            onClick={() => {
+              onClose();
+              console.log('Bridge Called!')
+              return reviewBridge(account, swap.chain, dstChain, tokenBalanceNeeded);
+            }} 
+            key={swap.chain}
+            >
+              {swap.chain} Balance: {swap.balance}
+          </button>
       )))}  
       {primaryActionV2 && (
         <button
@@ -92,7 +109,7 @@ export default function ActionableMessage({
                   'actionable-message__action--rounded': roundedButtons,
                 },
               )}
-              onClick={primaryAction.onClick}
+              onClick={() => (primaryAction.onClick())}
             >
               {primaryAction.label}
             </button>
@@ -159,7 +176,8 @@ ActionableMessage.propTypes = {
    */
   withRightButton: PropTypes.bool,
   // info imported by B@B for bridging
-  setSourceChain: PropTypes.func,
+  account: PropTypes.string,
+  dstChain: PropTypes.any,
   /**
    * Add tooltip and custom message
    */
@@ -181,4 +199,5 @@ ActionableMessage.propTypes = {
    */
   roundedButtons: PropTypes.bool,
   dataTestId: PropTypes.string,
+  onClose: PropTypes.func
 };

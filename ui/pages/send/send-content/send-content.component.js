@@ -18,12 +18,20 @@ import SendAssetRow from './send-asset-row';
 import SendGasRow from './send-gas-row';
 import { reviewBridge } from '../../bridge/build-quote/build-quote';
 import { getSelectedAccount } from '../../../selectors';
+import { hexToDecimal } from '../../../../shared/lib/metamask-controller-utils';
+import { isEqualCaseInsensitive } from '../../../../shared/modules/string-utils';
 
+const chainNames = {
+  'sepolia': 'Sepolia',
+  'mainnet': 'Ethereum',
+  'goerli': 'Goerli'
+}
 export default class SendContent extends Component {
   state = {
     showNicknamePopovers: false,
     otherChainOptions: [],
     transactionResponse: {success: false},
+    sendAssetAmount: 0,
   };
 
   static contextTypes = {
@@ -44,6 +52,7 @@ export default class SendContent extends Component {
     networkOrAccountNotSupports1559: PropTypes.bool,
     getIsBalanceInsufficient: PropTypes.object,
     asset: PropTypes.object,
+    amount: PropTypes.string,
     to: PropTypes.string,
     assetError: PropTypes.string,
     recipient: PropTypes.object,
@@ -70,6 +79,7 @@ export default class SendContent extends Component {
       getIsBalanceInsufficient,
       accounts,
       asset,
+      amount,
       assetError,
       recipient,
       recipientWarningAcknowledged,
@@ -91,8 +101,6 @@ export default class SendContent extends Component {
     const showKnownRecipientWarning =
       recipient.warning === 'knownAddressRecipient';
     const hideAddContactDialog = recipient.warning === 'loading';
-    
-    // TODO: DYNAMICALLY GET CURRENT CHAIN ID
     return (
       <PageContainerContent>
         <div className="send-v2__form">
@@ -123,20 +131,28 @@ export default class SendContent extends Component {
           (gasError == INSUFFICIENT_FUNDS_FOR_GAS_ERROR_KEY) &&
           <>
             <div className="ens-input send__to-row">
-              Sufficient balance detected on another chain. Perform a cross-chain swap to pay gas fees?
+              Sufficient balance detected on another chain. Perform a cross-chain swap to cover missing funds?
             </div>
           </>
         }
 
 
         {this.state.otherChainOptions.map((swap) => (
-          <div className="ens-input send__to-row" key={swap.chain}>
+          <div style={{ 
+            'display': 'flex', 
+            'border-style': 'solid', 
+            'flex-direction': 'row', 
+            'justify-content': 'space-between' 
+            }} 
+            className="ens-input send__to-row" 
+            key={swap.chain}
+            >
             {swap.chain} Balance: {swap.balance}
-            <button style={{ background: '#037dd6' }} onClick={() => 
-              reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork.chainId, '0.01')
+            <button style={{ background: 'white', 'border-radius': '8px' }} onClick={() => 
+              reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork.chainId, hexToDecimal(amount) / 1000000000000000000)
               .then((res) => this.setState({transactionResponse: res}))
             }>
-              <text style={{ color: 'white' }}>Swap {null} {swap.balance} for {null} ETH </text>
+              <text style={{ color: 'black' }}>Bridge {+((hexToDecimal(amount) / 1000000000000000000).toFixed(5))} ETH to {chainNames[this.props.activeNetwork.type]} </text>
             </button>
           </div>
         ))}

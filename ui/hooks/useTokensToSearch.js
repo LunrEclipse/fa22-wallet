@@ -20,6 +20,8 @@ import { TOKEN_BUCKET_PRIORITY } from '../../shared/constants/swaps';
 import { CHAIN_IDS, CURRENCY_SYMBOLS } from '../../shared/constants/network';
 import { useEqualityCheck } from './useEqualityCheck';
 
+import { activeChainsInfo } from '../../types/chains';
+
 export function getRenderableTokenData(
   token,
   contractExchangeRates,
@@ -59,8 +61,11 @@ export function getRenderableTokenData(
 
   const chainIdForTokenIcons =
     chainId === CHAIN_IDS.GOERLI ? CHAIN_IDS.MAINNET : chainId;
-
+  console.log('name', name)
+  const interstellarChain = activeChainsInfo.find((chain) => chain.name.toLowerCase().includes(name.toLowerCase()))
+  console.log(interstellarChain)
   const tokenIconUrl =
+    (interstellarChain && interstellarChain.iconUrl) ||
     (symbol === CURRENCY_SYMBOLS.ETH && chainId === CHAIN_IDS.MAINNET) ||
     (symbol === CURRENCY_SYMBOLS.ETH && chainId === CHAIN_IDS.GOERLI) ||
     (symbol === CURRENCY_SYMBOLS.BNB && chainId === CHAIN_IDS.BSC) ||

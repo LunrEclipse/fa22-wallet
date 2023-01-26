@@ -17,6 +17,8 @@ import {
   getRecipient,
   acknowledgeRecipientWarning,
   getRecipientWarningAcknowledgement,
+  getCurrentDraftTransaction,
+  getSendAmount,
 } from '../../../ducks/send';
 
 import SendContent from './send-content.component';
@@ -26,10 +28,11 @@ function mapStateToProps(state) {
   const accounts = getMetaMaskAccountsOrdered(state);
   const activeNetwork = state.metamask.provider;
   const to = getSendTo(state);
+  const amount = getSendAmount(state);
   const recipient = getRecipient(state);
   const recipientWarningAcknowledged =
     getRecipientWarningAcknowledgement(state);
-  return {
+    return {
     isOwnedAccount: Boolean(
       ownedAccounts.find(
         ({ address }) => address.toLowerCase() === to.toLowerCase(),
@@ -41,6 +44,7 @@ function mapStateToProps(state) {
     isEthGasPrice: getIsEthGasPriceFetched(state),
     noGasPrice: getNoGasPriceFetched(state),
     to,
+    amount,
     networkOrAccountNotSupports1559:
       checkNetworkOrAccountNotSupports1559(state),
     getIsBalanceInsufficient: getIsBalanceInsufficient(state),

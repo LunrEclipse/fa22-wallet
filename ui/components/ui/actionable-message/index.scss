@@ -90,6 +90,25 @@
     margin-top: 12px;
   }
 
+  &__bridgeOptions{
+    .bridgeOptions:hover {
+      cursor: pointer;
+      padding: 4px 0px 4px 0px;
+      background: gray;
+    }
+
+    cursor: pointer;
+    padding: 4px 0px 4px 0px;
+  }
+
+  
+  
+  // a,
+  // a:hover {
+  //   color: var(--color-primary-alternative);
+  //   cursor: pointer;
+  // }
+
   &__info-tooltip-wrapper {
     position: absolute;
     right: 4px;
