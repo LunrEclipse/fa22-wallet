@@ -2,7 +2,7 @@
   width: 100%;
   min-height: 86px;
   margin: 0;
-  background: var(--color-background-default);
+  background: black;
   padding: 24px 16px;
 
   @include Paragraph;
@@ -61,6 +61,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    color: white;
   }
 
   &__subheading {

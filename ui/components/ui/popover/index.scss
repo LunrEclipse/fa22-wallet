@@ -23,10 +23,13 @@
   &-header {
     position: relative;
 
+    background: black;
+
     &__title {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      color: white;
 
       @include H4;
 
@@ -37,6 +40,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: white;
 
         button {
           margin-right: 24px;
@@ -50,6 +54,7 @@
 
     &__subtitle {
       @include H6;
+      color: white;
     }
 
     &__button {
@@ -76,6 +81,7 @@
     position: relative;
     flex: 1;
     align-content: stretch;
+    background: black;
   }
 
   &-container {

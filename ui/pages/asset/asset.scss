@@ -1,6 +1,6 @@
 .asset {
   &__container {
-    background-color: var(--color-background-default);
+    background-color: black;;
   }
 
   &__overview {
@@ -19,7 +19,7 @@
 .asset-breadcrumb {
   @include H6;
 
-  color: var(--color-text-default);
+  color: white;
   background-color: inherit;
 
   &__chevron {

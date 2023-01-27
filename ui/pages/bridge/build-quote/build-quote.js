@@ -273,13 +273,7 @@ export default function BuildQuote({
     chainId,
     tokenList,
   );
-  // useEffect(() => {
-  //   let token = activeChainsInfo.find(({ address }) =>
-  //     isEqualCaseInsensitive(address, toToken?.address),
-  //   )
-  //   selectedFromToken.iconUrl = token.iconUrl;
-  //   console.log(selectedFromToken.iconUrl)
-  // }, [selectedFromToken]);
+  
 
 
   // let temp = useTokensToSearch({

@@ -1,6 +1,6 @@
 .transaction-list-item {
   &__primary-currency {
-    color: var(--color-text-default);
+    color: white;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -17,7 +17,7 @@
   }
 
   &--unconfirmed &__primary-currency {
-    color: var(--color-text-alternative);
+    color: white;
   }
 
   &__pending-actions {
