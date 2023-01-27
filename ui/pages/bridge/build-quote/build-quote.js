@@ -148,6 +148,7 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
   let fee = parseFloat(amount);
   fee += 0.25;
   console.log(fee)
+  console.log(amount)
   let messageFee = ethers.utils.parseEther(fee.toString());  
   let quantity = ethers.utils.parseEther(amount.toString()); 
   let min = ethers.utils.parseEther('0');
@@ -782,7 +783,7 @@ export default function BuildQuote({
           /* istanbul ignore next */
           () => {
             if (selectedFromToken && selectedToToken) {
-              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, hexToDecimal(fromTokenInputValue) / 1000000000000000000);
+              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
             }
           }
         }
