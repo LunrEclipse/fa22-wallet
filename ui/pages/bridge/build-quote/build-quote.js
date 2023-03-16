@@ -168,7 +168,6 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
       srcChain,
       dstChain,
       txHash: swapTxn.hash,
-      value: ethers.utils.formatEther(swapTxn.value.toNumber()),
       success: true
     }
   } else {
