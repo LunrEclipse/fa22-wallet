@@ -146,7 +146,7 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
 
   stargateContract = await stargateContract.connect(signer)
   let fee = parseFloat(amount);
-  fee += 0.25;
+  fee += 0.01;
   console.log(fee)
   console.log(amount)
   let messageFee = ethers.utils.parseEther(fee.toString());  

@@ -86,6 +86,7 @@ export default class SendContent extends Component {
     } = this.props;
 
     let gasError;
+    console.log(this.props.activeNetwork);
     if (gasIsExcessive) {
       gasError = GAS_PRICE_EXCESSIVE_ERROR_KEY;
     } else if (noGasPrice) {
@@ -98,6 +99,7 @@ export default class SendContent extends Component {
       asset.type !== ASSET_TYPES.TOKEN &&
       asset.type !== ASSET_TYPES.COLLECTIBLE;
 
+    
     const showKnownRecipientWarning =
       recipient.warning === 'knownAddressRecipient';
     const hideAddContactDialog = recipient.warning === 'loading';
@@ -149,10 +151,10 @@ export default class SendContent extends Component {
             >
             {swap.chain} Balance: {swap.balance}
             <button style={{ background: 'white', 'border-radius': '8px' }} onClick={() => 
-              reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork.chainId, hexToDecimal(amount) / 1000000000000000000)
+              reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork.chainId, (hexToDecimal(amount) - this.state.otherChainOptions[1].balance * 1000000000000000000) / 1000000000000000000) 
               .then((res) => this.setState({transactionResponse: res}))
             }>
-              <text style={{ color: 'black' }}>Bridge {+((hexToDecimal(amount) / 1000000000000000000).toFixed(5))} ETH to {chainNames[this.props.activeNetwork.type]} </text>
+              <text style={{ color: 'black' }}>Bridge {+(((hexToDecimal(amount)) / 1000000000000000000).toFixed(5) - this.state.otherChainOptions.filter(x=>(x.chain.toLowerCase()) == this.props.activeNetwork.type.toLowerCase())[0].balance)} ETH to {chainNames[this.props.activeNetwork.type]} </text>
             </button>
           </div>
         ))}

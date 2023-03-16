@@ -122,15 +122,15 @@ export default class TxGasUtil {
 
   // take in gas estimate on current chain // by unit 
   async getGasPricesOnOtherChains(gasObj, fromAddress) {
-    return [{balance: 2, chain: 'Arbitrum'}, {balance: 3, chain: 'Goerli'}, {balance: 4, chain: 'Optimism'}]; // todo: update w proper names
+    // return [{balance: 2, chain: 'Arbitrum'}, {balance: 3, chain: 'Goerli'}, {balance: 4, chain: 'Optimism'}]; // todo: update w proper names
  
 
     var gasNeeded = 9999; // TODO: this sbould get passed in from send.js/getIsBalanceInsufficient
 
-    // polygon balance
-    var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
-    var balance = await api.account.balance(fromAddress);
-    var polyBalance = balance.result;
+    // // polygon balance
+    // var api = require("polygonscan-api").init("W8CI2MGVN5NH9SXSH9BIXVBVZ9P95Z2UGK");
+    // var balance = await api.account.balance(fromAddress);
+    // var polyBalance = balance.result;
 
     // arbitrum balance
     var arbBalance = await axios.get("https://api-goerli.arbiscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=WMKZ9X5YUTEV5ZYK27CYMKTDD6SPBTZM88")
@@ -156,8 +156,10 @@ export default class TxGasUtil {
       return optBalFixed;
     })
 
-    console.log(arbBalance)
-    return [{balance: polyBalance, chain: 'Polygon'}, {balance: arbBalance, chain: 'Arbitrum'}, {balance: goBalance, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
+    // console.log(polyBalance, arbBalance, goBalance, optbalance);
+    // return [{balance: 2, chain: 'Arbitrum'}, {balance: 3, chain: 'Goerli'}, {balance: 4, chain: 'Optimism'}]; // todo: update w proper names
+    return [{balance: arbBalance, chain: 'Arbitrum'}, {balance: 0.3, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
+    // return [{balance: 1, chain: 'Polygon'}, {balance: arbBalance, chain: 'Arbitrum'}, {balance: goBalance, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
   }
 }
 
