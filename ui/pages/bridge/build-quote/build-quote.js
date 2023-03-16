@@ -125,6 +125,54 @@ const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
 
+export async function getFees (address, sourceChainRaw, destinationChainRaw, amount) {
+  if (sourceChainRaw === undefined || destinationChainRaw === undefined) {
+    return
+  };
+  console.log(amount)
+  const srcChain = activeChainsInfo.find((chain) => chain.name === sourceChainRaw);
+  const dstChain = activeChainsInfo.find((chain) => chain.metamaskChainID === destinationChainRaw);
+
+  console.log('dstChain:',  dstChain)
+  console.log('srcChain: ',  srcChain)
+  let provider = ethers.getDefaultProvider(srcChain.providerName)
+  // TODO: get private key
+  let wallet = await new ethers.Wallet("67b3c7bf6245fd1d70b5765dfa7b482fde0a8aa87bde816046b63f6d999a154f", provider)
+
+  //Starting Chain
+  let stargateContract = await new ethers.Contract(srcChain.routerAddress, routerABI)
+
+  let signer = await wallet.connect(provider)
+
+  stargateContract = await stargateContract.connect(signer)
+
+  // uint16 _dstChainId,
+  // uint8 _functionType,
+  // bytes calldata _toAddress,
+  // bytes calldata _transferAndCallPayload,
+  // Router.lzTxObj memory _lzTxParams
+
+  const feeTxn = await stargateContract.quoteLayerZeroFee(
+    dstChain.stargateID, 
+    1, 
+    address, 
+    "0x",
+    ({
+        dstGasForCall: 0,       // extra gas, if calling smart contract,
+        dstNativeAmount: 0,     // amount of dust dropped in destination wallet 
+        dstNativeAddr: address // destination wallet for dust
+    }),
+    {gasLimit: 1000000}
+  ) 
+
+  console.log(feeTxn)
+  console.log(feeTxn[0].toNumber())
+  let fees = getValueFromWeiHex({ value: feeTxn[0], fromCurrency: 'ETH', toCurrency: 'ETH', numberOfDecimals: 6, conversionRate: 1, invertConversionRate: false })
+  fees = parseFloat(fees)
+  
+  return fees
+}
+
 export async function reviewBridge (address, sourceChainRaw, destinationChainRaw, amount) {
   if (sourceChainRaw === undefined || destinationChainRaw === undefined) {
     return
@@ -762,7 +810,10 @@ export default function BuildQuote({
         onSubmit={
           /* istanbul ignore next */
           () => {
-            setReviewClicked(true);
+            if (selectedFromToken && selectedToToken) {
+              getFees(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
+              setReviewClicked(true);
+            }
           }
         }
         submitText={"Review Bridge"}
