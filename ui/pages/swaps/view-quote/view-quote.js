@@ -935,7 +935,7 @@ export default function ViewQuote() {
               <ActionableMessage
                 message={actionableBalanceErrorMessage}
                 
-                account={activeAccount.addres}
+                account={activeAccount.address}
                 dstChain={provider.chainId}
                 gasOptions={gasOnOtherChains}
                 tokenBalanceNeeded={tokenBalanceNeeded}

@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import InfoTooltip from '../info-tooltip';
 import InfoTooltipIcon from '../info-tooltip/info-tooltip-icon';
 import { activeChainsInfo } from '../../../../types/chains'
-import { reviewBridge } from '../../../pages/bridge/build-quote/build-quote';
+import { reviewBridge, getFees} from '../../../pages/bridge/build-quote/build-quote';
 
 const CLASSNAME_WARNING = 'actionable-message--warning';
 const CLASSNAME_DANGER = 'actionable-message--danger';
@@ -38,7 +38,17 @@ export default function ActionableMessage({
   dataTestId,
   onClose,
 }) {
+  const [fees, setFees] = useState(0)
+  const [toggle, setToggle] = useState(0)
+
+  if (gasOptions !== undefined && gasOptions.length > 0) {
+    console.log('gasOptions: ', gasOptions)
+    getFees(account, gasOptions[0].chain, dstChain, tokenBalanceNeeded).then((res) => {
+      setFees(res)
+      });
+  }
   const [destinationChain, setDestinationChain] = useState('')
+  const [txnResponse, setTxnResponse] = useState('')
   const actionableMessageClassName = classnames(
     'actionable-message',
     typeHash[type],
@@ -59,9 +69,12 @@ export default function ActionableMessage({
           wrapperClassName="actionable-message__info-tooltip-wrapper"
         />
       )}
-      <div className="actionable-message__message">{message}</div>
-      {gasOptions !== undefined &&  (
+      <div className="actionable-message__message">
+        {message}
+      </div>
+      {txnResponse == '' && gasOptions !== undefined &&  (
         gasOptions.map((swap) => (
+          <>
           <button onMouseOver="this.style.background-color='gray'"
             // class="actionable-message__bridgeOptions"
             style={{ 
@@ -76,15 +89,35 @@ export default function ActionableMessage({
               }} 
 
             onClick={() => {
-              onClose();
               console.log('Bridge Called!')
-              return reviewBridge(account, swap.chain, dstChain, tokenBalanceNeeded);
+              reviewBridge(account, swap.chain, dstChain, tokenBalanceNeeded).then((tx) => setTxnResponse(tx));
+              // setTxnResponse({
+              //   txHash: '0x1234567890',
+              //   srcChainID: 1,
+              // })
             }} 
             key={swap.chain}
             >
               {swap.chain} Balance: {swap.balance}
           </button>
-      )))}  
+          <div>
+            Gas Cost To Bridge: {fees}
+          </div>
+          </>
+      )))}
+      {txnResponse !== '' &&  (
+        <div style={{ 'color': 'black', 'display': 'flex', 'flex-direction': 'column', 'text-align': 'center', 'padding-top': '5px' 
+      }}>  
+          <div style={{ 'color': 'black', 'text-align': 'center', 'font-weight': 'bold', 'font-size': '15px', }}>
+            Transaction {txnResponse.txHash.substring(0, 9)}... Submitted!
+          </div>
+          <div style={{ 'color': 'black', 'text-align': 'center', 'padding-top': '5px'}}>
+            View Here: 
+          </div>
+          <a style={{ 'color': 'blue', 'text-align': 'center', 'padding-top': '3px'}} href={'https://testnet.layerzeroscan.com/'}>
+              {'layerzeroscan.com/' + txnResponse.txHash.substring(0, 9)}...</a>
+        </div>
+        )}  
       {primaryActionV2 && (
         <button
           className="actionable-message__action-v2"

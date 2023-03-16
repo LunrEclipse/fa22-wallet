@@ -23,7 +23,7 @@ export const activeChainsInfo = [
       secondaryLabel: "ETH",
       providerName: 'https://goerli-rollup.arbitrum.io/rpc',
       stargateAddress: '0x7612aE2a34E5A363E137De748801FB4c86499152',
-      routerAddress: "0xb850873f4c993Ac2405A1AdD71F6ca5D4d4d6b4f",
+      routerAddress: '0xb850873f4c993Ac2405A1AdD71F6ca5D4d4d6b4f',
       stargateID: 10143,
       metamaskChainID: '0x66eed'
     },
@@ -37,7 +37,7 @@ export const activeChainsInfo = [
       secondaryLabel: "ETH",
       providerName: 'https://mainnet.optimism.io', // fix
       stargateAddress: '0xc744E5c3E5A4F6d70Df217a0837D32B05a951d08',
-      routerAddress: "0x95461eF0e0ecabC049a5c4a6B98Ca7B335FAF068",
+      routerAddress: '0x95461eF0e0ecabC049a5c4a6B98Ca7B335FAF068',
       stargateID: 10132,
       metamaskChainID: '0x1a4'
     },

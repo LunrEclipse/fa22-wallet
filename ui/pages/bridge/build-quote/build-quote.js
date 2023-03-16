@@ -109,6 +109,7 @@ import { hexToDecimal } from '../../../../shared/lib/metamask-controller-utils';
 import { calcTokenAmount } from '../../../../shared/lib/transactions-controller-utils';
 import { shouldEnableDirectWrapping } from '../../../../shared/lib/swaps-utils';
 
+
 import { ethers, signer } from "ethers";
 import stargateABI from "../../../utils/ethRouter"
 import routerABI from "../../../utils/stargateABI"
@@ -131,6 +132,9 @@ export async function getFees (address, sourceChainRaw, destinationChainRaw, amo
     return
   };
   console.log(amount)
+  if (address === undefined) {
+    address = "0x0000000000000000000000000000000000000000"
+  }
   const srcChain = activeChainsInfo.find((chain) => chain.name === sourceChainRaw);
   const dstChain = activeChainsInfo.find((chain) => chain.metamaskChainID === destinationChainRaw);
 
@@ -153,6 +157,7 @@ export async function getFees (address, sourceChainRaw, destinationChainRaw, amo
   // bytes calldata _transferAndCallPayload,
   // Router.lzTxObj memory _lzTxParams
 
+  console.log(address)
   const feeTxn = await stargateContract.quoteLayerZeroFee(
     dstChain.stargateID, 
     1, 
@@ -163,9 +168,10 @@ export async function getFees (address, sourceChainRaw, destinationChainRaw, amo
         dstNativeAmount: 0,     // amount of dust dropped in destination wallet 
         dstNativeAddr: address // destination wallet for dust
     }),
-    {gasLimit: 1000000}
+    {gasLimit: 10000000}
   ) 
-
+  
+  console.log("FEE TXN: ", feeTxn)
   let res = getValueFromWeiHex({ value: feeTxn[0], fromCurrency: 'ETH', toCurrency: 'ETH', numberOfDecimals: 6, conversionRate: 1, invertConversionRate: false })
   res = parseFloat(res)
   console.log("FEE: ", res)
@@ -194,6 +200,7 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
   stargateContract = await stargateContract.connect(signer)
   let fee = parseFloat(amount);
   let res = await getFees(address, sourceChainRaw, destinationChainRaw, amount)
+  console.log("FEES: " + res)
   fee += res;
   let messageFee = ethers.utils.parseEther(fee.toString());  
   let quantity = ethers.utils.parseEther(amount.toString()); 
@@ -208,7 +215,7 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
   ) // errors not logged properly from stargate 
 
   console.log("Total Amount: ", fee)
-  
+  console.log('SWAP TRANSACTION::')
   console.log(swapTxn)
   
   if (swapTxn) {
@@ -216,7 +223,9 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
       srcChain,
       dstChain,
       txHash: swapTxn.hash,
-      success: true
+      success: true,
+      srcChainID: srcChain.stargateID,
+      dstChainID: dstChain.stargateID
     }
   } else {
     return {      
@@ -243,6 +252,7 @@ export default function BuildQuote({
   const [totalCost, setTotalCost] = useState(0)
   const [submitClicked, setSubmitClicked] = useState(false);
   const [txHash, setTxHash] = useState('');
+  const [lzScanId, setLzScanId] = useState(0);
 
   const isFeatureFlagLoaded = useSelector(getIsFeatureFlagLoaded);
   const keyring = useSelector(getMetaMaskKeyrings)
@@ -845,6 +855,7 @@ export default function BuildQuote({
               if (selectedFromToken && selectedToToken) {
                 let txn = await reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
                 setTxHash(txn.txHash);
+                setLzScanId(txn.srcChainID);
                 setSubmitClicked(true);
               }
             }
@@ -856,13 +867,40 @@ export default function BuildQuote({
         </>)}
         {submitClicked && (
           <>
-            <div className="build-quote__content">
-              <div className="ens-input send__to-row">
+            <div  
+              className="build-quote__content"
+            >
+              <div 
+                style={{ 
+                'color': 'white',
+                'text-align': 'center',
+                'font-size': '18px',
+                'font-weight': 'bold'
+                }} 
+              className="ens-input send__to-row"
+              >
                 Transaction {txHash.substring(0, 9)}... Submitted!
               </div>
-              <div className="ens-input send__to-row">
+              <div 
+                style={{ 
+                'color': 'white',
+                'display': 'flex',
+                'flex-direction': 'row',
+                'justify-content': 'center',
+                'text-align': 'center',
+                'font-size': '18px'
+                }} 
+                className="ens-input send__to-row"
+              >
                 View Here: 
               </div>
+              <a 
+                style={{ 
+                'color': 'white',
+                'text-align': 'center',
+                }} 
+                href={'https://testnet.layerzeroscan.com/'}
+              >{'layerzeroscan.com/' + txHash.substring(0, 9)}...</a>
             </div>
           </>
           )}

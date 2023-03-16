@@ -16,7 +16,7 @@ import SendAmountRow from './send-amount-row';
 import SendHexDataRow from './send-hex-data-row';
 import SendAssetRow from './send-asset-row';
 import SendGasRow from './send-gas-row';
-import { reviewBridge } from '../../bridge/build-quote/build-quote';
+import { reviewBridge, getFees } from '../../bridge/build-quote/build-quote';
 import { getSelectedAccount } from '../../../selectors';
 import { hexToDecimal } from '../../../../shared/lib/metamask-controller-utils';
 import { isEqualCaseInsensitive } from '../../../../shared/modules/string-utils';
@@ -26,12 +26,15 @@ const chainNames = {
   'mainnet': 'Ethereum',
   'goerli': 'Goerli'
 }
+
+
 export default class SendContent extends Component {
   state = {
     showNicknamePopovers: false,
     otherChainOptions: [],
     transactionResponse: {success: false},
     sendAssetAmount: 0,
+    fees: 0.062107,
   };
 
   static contextTypes = {
@@ -103,6 +106,11 @@ export default class SendContent extends Component {
     const showKnownRecipientWarning =
       recipient.warning === 'knownAddressRecipient';
     const hideAddContactDialog = recipient.warning === 'loading';
+    // if (this.state.otherChainOptions?.length !== 0) {
+    //   getFees(this.props.accounts[0].address, this.state.otherChainOptions[0].chain, this.props.activeNetwork.chainId, 0).then((res) => {
+    //     this.setState({fees: res})
+    //     });
+    // }
     return (
       <PageContainerContent>
         <div className="send-v2__form">
@@ -154,7 +162,8 @@ export default class SendContent extends Component {
               reviewBridge(this.props.accounts[0].address, swap.chain, this.props.activeNetwork.chainId, (hexToDecimal(amount) - this.state.otherChainOptions[1].balance * 1000000000000000000) / 1000000000000000000) 
               .then((res) => this.setState({transactionResponse: res}))
             }>
-              <text style={{ color: 'black' }}>Bridge {+(((hexToDecimal(amount)) / 1000000000000000000).toFixed(5) - this.state.otherChainOptions.filter(x=>(x.chain.toLowerCase()) == this.props.activeNetwork.type.toLowerCase())[0].balance)} ETH to {chainNames[this.props.activeNetwork.type]} </text>
+              <text style={{ color: 'black' }}>Bridge {+(((hexToDecimal(amount)) / 1000000000000000000).toFixed(5) - this.state.otherChainOptions.filter(x=>(x.chain.toLowerCase()) == this.props.activeNetwork.type.toLowerCase())[0].balance).toFixed(6)} ETH to {chainNames[this.props.activeNetwork.type]} </text>
+              <text>Gas Fee to Bridge: {this.state.fees}</text>
             </button>
           </div>
         ))}
@@ -201,7 +210,8 @@ export default class SendContent extends Component {
                     'text-decoration': 'underline',
                     }} 
                 >
-                  <a href={'https://layerzeroscan.com/' + 10143 + '/address/' + this.state.transactionResponse.txHash}>{(this.state.transactionResponse.txHash).substring(0, 8)}...</a>
+                  <a href={'https://testnet.layerzeroscan.com/'}>
+                    {'layerzeroscan.com/' + this.state.transactionResponse.txHash.substring(0, 9)}...</a>                
                 </div>
               </div>
             </div>

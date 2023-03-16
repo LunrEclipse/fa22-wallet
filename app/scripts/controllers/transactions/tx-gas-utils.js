@@ -139,7 +139,7 @@ export default class TxGasUtil {
       const arbBalFixed = (arbBal / 1000000000000000000).toFixed(5);
       return arbBalFixed;
     })
-    console.log("post arb")
+    //console.log("post arb")
 
     // goerli balance
     var goBalance = await axios.get("https://api-goerli.etherscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=YQMRKMD93AIZUWZVJ8YXWXWJV65PGG8J3F")
@@ -148,7 +148,7 @@ export default class TxGasUtil {
       const goBalFixed = (goBal / 1000000000000000000).toFixed(5);
       return goBalFixed;
     })
-    console.log("post go")
+    //console.log("post go")
 
     // optimism balance
     var optbalance = await axios.get("https://api-optimistic.etherscan.io/api?module=account&action=balance&address=" + fromAddress + "&tag=latest&apikey=KPHMQMAVMM6CBH7C9SFVSBJQ9SDDSDW851")
@@ -157,10 +157,10 @@ export default class TxGasUtil {
       const optBalFixed = (optBal / 1000000000000000000).toFixed(5);
       return optBalFixed;
     })
-    console.log("post opt")
+    //console.log("post opt")
     // console.log(polyBalance, arbBalance, goBalance, optbalance);
     // return [{balance: 2, chain: 'Arbitrum'}, {balance: 3, chain: 'Goerli'}, {balance: 4, chain: 'Optimism'}]; // todo: update w proper names
-    return [{balance: arbBalance, chain: 'Arbitrum'}, {balance: 0.3, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
+    return [{balance: arbBalance, chain: 'Arbitrum'}, {balance: goBalance, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
     // return [{balance: 1, chain: 'Polygon'}, {balance: arbBalance, chain: 'Arbitrum'}, {balance: goBalance, chain: 'Goerli'}, {balance: optbalance, chain: 'Optimism'}]; // todo: update w proper names
   }
 }
