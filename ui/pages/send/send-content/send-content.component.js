@@ -166,11 +166,44 @@ export default class SendContent extends Component {
         {
           (this.state.transactionResponse.success) &&
           <>
-            <div className="ens-input send__to-row">
+            <div style={{ 
+            'display': 'flex', 
+            'border-style': 'solid', 
+            'background-color': 'white',
+            'flex-direction': 'column', 
+            'justify-content': 'space-between',
+            'border-radius': '20px',
+            'color': 'black',
+            }} 
+            className="ens-input send__to-row">
+              <text 
+              style={{ 
+              'color': 'black',
+              }} 
+            >
               Bridged {this.state.transactionResponse.value} 
               ETH from {this.state.transactionResponse.srcChain.chainName } 
-              to {this.state.transactionResponse.dstChain.chainName}. {"\n"}
-              Tx hash: {this.state.transactionResponse.txHash}
+              to {chainNames[this.props.activeNetwork.type]}.
+              </text>
+              <div
+                style={{ 
+                'color': 'black',
+                'flex-direction': 'column', 
+                'display': 'flex', 
+                }} 
+              >
+                <text>
+                  See Transaction Here: 
+                </text>
+                <div
+                  style={{ 
+                    'color': 'blue',
+                    'text-decoration': 'underline',
+                    }} 
+                >
+                  <a href={'https://layerzeroscan.com/' + 10143 + '/address/' + this.state.transactionResponse.txHash}>{(this.state.transactionResponse.txHash).substring(0, 8)}...</a>
+                </div>
+              </div>
             </div>
           </>
         }

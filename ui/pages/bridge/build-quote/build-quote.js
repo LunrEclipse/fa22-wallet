@@ -160,7 +160,8 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
     min,
     {value: messageFee, gasLimit: 1000000}
   ) // errors not logged properly from stargate 
-  
+  console.log("SWAP TXN:::::")
+
   console.log(swapTxn)
   
   if (swapTxn) {
