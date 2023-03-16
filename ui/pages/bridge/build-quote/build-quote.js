@@ -240,6 +240,9 @@ export default function BuildQuote({
   const [verificationClicked, setVerificationClicked] = useState(false);
   const [reviewClicked , setReviewClicked] = useState(false);
   const [fees, setFees] = useState(0)
+  const [totalCost, setTotalCost] = useState(0)
+  const [submitClicked, setSubmitClicked] = useState(false);
+  const [txHash, setTxHash] = useState('');
 
   const isFeatureFlagLoaded = useSelector(getIsFeatureFlagLoaded);
   const keyring = useSelector(getMetaMaskKeyrings)
@@ -696,7 +699,9 @@ export default function BuildQuote({
 
   return (
     <div className="build-quote">
-      <div className="build-quote__content">
+      {!submitClicked && (
+        <>
+        <div className="build-quote__content">
         <div className="build-quote__dropdown-input-pair-header">
           <div className="build-quote__input-label">Bridge from</div>
           {!isSwapsDefaultTokenSymbol(fromTokenSymbol, chainId) && (
@@ -814,6 +819,8 @@ export default function BuildQuote({
             if (selectedFromToken && selectedToToken) {
               let temp = await getFees(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
               setFees(temp);
+              temp = temp + parseFloat(fromTokenInputValue);
+              setTotalCost(temp);
               setReviewClicked(true);
             }
           }
@@ -823,20 +830,42 @@ export default function BuildQuote({
       /> )
       }
       {reviewClicked && (
-        <SwapsFooter
-        disabled={!fromTokenError && balanceError}
-        onSubmit={
-          /* istanbul ignore next */
-          () => {
-            if (selectedFromToken && selectedToToken) {
-              reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
+        <>
+          <div className="ens-input send__to-row">
+            Gas Fees Required to Bridge: {fees}
+          </div>
+          <div className="ens-input send__to-row">
+            Are you sure you want to bridge {fromTokenInputValue} {selectedFromToken.name} to {selectedToToken.name} for {totalCost} {selectedFromToken.name}?
+          </div>
+          <SwapsFooter
+          disabled={!fromTokenError && balanceError}
+          onSubmit={
+            /* istanbul ignore next */
+            async () => {
+              if (selectedFromToken && selectedToToken) {
+                let txn = await reviewBridge(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
+                setTxHash(txn.txHash);
+                setSubmitClicked(true);
+              }
             }
           }
-        }
-        submitText={"Submit Bridge"}
-        hideCancel
-      /> )
-      }
+          submitText={"Confirm"}
+          hideCancel
+          />
+        </>)}
+        </>)}
+        {submitClicked && (
+          <>
+            <div className="build-quote__content">
+              <div className="ens-input send__to-row">
+                Transaction {txHash.substring(0, 9)}... Submitted!
+              </div>
+              <div className="ens-input send__to-row">
+                View Here: 
+              </div>
+            </div>
+          </>
+          )}
     </div>
   );
 }

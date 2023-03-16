@@ -61,9 +61,9 @@ export function getRenderableTokenData(
 
   const chainIdForTokenIcons =
     chainId === CHAIN_IDS.GOERLI ? CHAIN_IDS.MAINNET : chainId;
-  console.log('name', name)
-  const interstellarChain = activeChainsInfo.find((chain) => chain.name.toLowerCase().includes(name.toLowerCase()))
-  console.log(interstellarChain)
+  //console.log('name', name)
+  const interstellarChain = activeChainsInfo.find((chain) => chain.name.toLowerCase().includes(name))
+  //console.log(interstellarChain)
   const tokenIconUrl =
     (interstellarChain && interstellarChain.iconUrl) ||
     (symbol === CURRENCY_SYMBOLS.ETH && chainId === CHAIN_IDS.MAINNET) ||

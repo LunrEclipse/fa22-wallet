@@ -400,7 +400,7 @@ export default function Swap() {
             {!isAwaitingSwapRoute &&
               !isAwaitingSignaturesRoute &&
               !isSmartTransactionStatusRoute &&
-              t('cancel')}
+              "Go Back"}
           </div>
         </div>
         <div className="swaps__content">
