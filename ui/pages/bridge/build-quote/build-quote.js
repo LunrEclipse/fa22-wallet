@@ -125,6 +125,7 @@ const MAX_ALLOWED_SLIPPAGE = 15;
 
 let timeoutIdForQuotesPrefetching;
 
+
 export async function getFees (address, sourceChainRaw, destinationChainRaw, amount) {
   if (sourceChainRaw === undefined || destinationChainRaw === undefined) {
     return
@@ -165,12 +166,10 @@ export async function getFees (address, sourceChainRaw, destinationChainRaw, amo
     {gasLimit: 1000000}
   ) 
 
-  console.log(feeTxn)
-  console.log(feeTxn[0].toNumber())
-  let fees = getValueFromWeiHex({ value: feeTxn[0], fromCurrency: 'ETH', toCurrency: 'ETH', numberOfDecimals: 6, conversionRate: 1, invertConversionRate: false })
-  fees = parseFloat(fees)
-  
-  return fees
+  let res = getValueFromWeiHex({ value: feeTxn[0], fromCurrency: 'ETH', toCurrency: 'ETH', numberOfDecimals: 6, conversionRate: 1, invertConversionRate: false })
+  res = parseFloat(res)
+  console.log("FEE: ", res)
+  return res
 }
 
 export async function reviewBridge (address, sourceChainRaw, destinationChainRaw, amount) {
@@ -194,9 +193,8 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
 
   stargateContract = await stargateContract.connect(signer)
   let fee = parseFloat(amount);
-  fee += 0.01;
-  console.log(fee)
-  console.log(amount)
+  let res = await getFees(address, sourceChainRaw, destinationChainRaw, amount)
+  fee += res;
   let messageFee = ethers.utils.parseEther(fee.toString());  
   let quantity = ethers.utils.parseEther(amount.toString()); 
   let min = ethers.utils.parseEther('0');
@@ -208,8 +206,9 @@ export async function reviewBridge (address, sourceChainRaw, destinationChainRaw
     min,
     {value: messageFee, gasLimit: 1000000}
   ) // errors not logged properly from stargate 
-  console.log("SWAP TXN:::::")
 
+  console.log("Total Amount: ", fee)
+  
   console.log(swapTxn)
   
   if (swapTxn) {
@@ -240,6 +239,7 @@ export default function BuildQuote({
     useState(undefined);
   const [verificationClicked, setVerificationClicked] = useState(false);
   const [reviewClicked , setReviewClicked] = useState(false);
+  const [fees, setFees] = useState(0)
 
   const isFeatureFlagLoaded = useSelector(getIsFeatureFlagLoaded);
   const keyring = useSelector(getMetaMaskKeyrings)
@@ -810,9 +810,10 @@ export default function BuildQuote({
         <SwapsFooter
         onSubmit={
           /* istanbul ignore next */
-          () => {
+          async () => {
             if (selectedFromToken && selectedToToken) {
-              getFees(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
+              let temp = await getFees(selectedAccountAddress, selectedFromToken.name, selectedToToken.metamaskChainID, fromTokenInputValue);
+              setFees(temp);
               setReviewClicked(true);
             }
           }
